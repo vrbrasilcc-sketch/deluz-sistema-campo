@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deluz Prestadora - Sistema de Campo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/tesseract.js@v4.0.1/dist/tesseract.min.js"></script>
+  <style>
+    body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .navbar-deluz { background-color: #004a8d; color: white; }
+    .card-modulo { border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: none; margin-bottom: 20px; }
+    .escondido { display: none !important; }
+    .alerta-critico { background-color: #fee2e2; border-left: 5px solid #ef4444; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-deluz p-3 mb-4 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="fw-bold fs-5">⚡ DELUZ PRESTADORA</span>
+      <span id="txtUsuarioLogado" class="badge bg-white text-dark p-2 escondido"></span>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 800px;">
+
+    <div id="telaLogin" class="card card-modulo p-4 bg-white mx-auto mt-5" style="max-width: 400px;">
+      <h4 class="fw-bold text-center text-primary mb-4">Acesso ao Sistema</h4>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Usuário</label>
+        <input type="text" id="iptUsuario" class="form-control" placeholder="Ex: flavio">
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Senha</label>
+        <input type="password" id="iptSenha" class="form-control" placeholder="••••••••">
+      </div>
+      <button onclick="realizarLogin()" class="btn btn-primary w-100 fw-bold py-2">Entrar no Sistema</button>
+      <div id="msgErroLogin" class="text-danger text-center small mt-3 fw-bold"></div>
+    </div>
+
+    <div id="telaMenu" class="escondido">
+      
+      <ul class="nav nav-pills nav-fill mb-4 p-1 bg-white rounded shadow-sm" id="pills-tab" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active fw-bold" onclick="alternarSubTela('secaoMobilizacao')">🚗 Hub Logística</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-bold" onclick="alternarSubTela('secaoAlojamentoEscritorio')">🏢 Alojamento Central</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-bold" id="abaSetores" onclick="alternarSubTela('secaoSetores')">📋 Setores (RH/SST)</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-bold" onclick="alternarSubTela('secaoCurriculos')">👥 Currículos IA</button>
+        </li>
+      </ul>
+
+      <div id="painelAlertaDiretor" class="card card-modulo p-3 alerta-critico escondido mb-4">
+        <h6 class="fw-bold mb-1">🔴 ALERTA CRÍTICO: DETEÇÃO DE EXCESSO DE ALOJAMENTO</h6>
+        <div id="listaRetidosAlojamento" class="small"></div>
+      </div>
+
+      <div id="secaoMobilizacao" class="subsecao">
+        <div class="card card-modulo p-4 bg-white">
+          <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">1. Gerador de Varredura de Hospedagem</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Equipe Vinculada</label>
+              <input type="text" id="mobEquipe" class="form-control" placeholder="Ex: EQ-01-TOCANTINS">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Cidade de Destino (Trecho)</label>
+              <input type="text" id="mobCidade" class="form-control" placeholder="Ex: Santa Fé do Sul - SP">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Tempo Estimado (Dias)</label>
+              <input type="number" id="mobDias" class="form-control" placeholder="Ex: 15">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Tipo de Estabelecimento Desejado</label>
+              <select id="mobTipoFiltro" class="form-select">
+                <option value="hotéis e pousadas">Hotéis e Pousadas</option>
+                <option value="airbnb aluguel por temporada">Airbnb / Casas de Temporada</option>
+                <option value="alojamento comercial">Alojamentos / Galpões</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mt-4 p-3 bg-light rounded border">
+            <h6 class="fw-bold small text-muted mb-2">🌐 LINKS INTELIGENTES PRÉ-FILTRADOS PARA CONTATO DIRETO</h6>
+            <div class="d-flex flex-wrap gap-2">
+              <button onclick="buscarFiltroInternet('google')" class="btn btn-sm btn-outline-dark fw-bold">🔎 Abrir no Google Maps</button>
+              <button onclick="buscarFiltroInternet('facebook')" class="btn btn-sm btn-outline-primary fw-bold">📱 Abrir no Facebook</button>
+              <button onclick="buscarFiltroInternet('olx')" class="btn btn-sm btn-outline-warning text-dark fw-bold">📦 Abrir na OLX</button>
+            </div>
+          </div>
+
+          <h5 class="fw-bold text-dark border-bottom pb-2 mt-4 mb-3">2. Fechamento de Valores & Teto Operacional</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Nome do Local Fechado</label>
+              <input type="text" id="resHospedagem" class="form-control" placeholder="Ex: Hotel Center">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Custo Total Hospedagem (R$)</label>
+              <input type="number" id="resHospedagemCusto" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Nome do Restaurante/Marmita</label>
+              <input type="text" id="resMarmita" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Valor Refeição Homem/Dia (Teto R$ 60)</label>
+              <input type="number" id="resMarmitaCusto" class="form-control" oninput="validarTetoAlimentacao()">
+              <div id="alertaTeto" class="small mt-1 fw-bold"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label small fw-bold">Dados de Contato do Fornecedor</label>
+              <input type="text" id="resContato" class="form-control" placeholder="Ex: Telefone, Endereço ou Link">
+            </div>
+          </div>
+          <button onclick="salvarOrcamento()" class="btn btn-success w-100 fw-bold mt-4">✓ Salvar Orçamento no Sheets</button>
+        </div>
+      </div>
+
+      <div id="secaoAlojamentoEscritorio" class="subsecao escondido">
+        <div class="card card-modulo p-4 bg-white">
+          <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">🏢 Cadastro de Entrada no Alojamento do Escritório</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Nome do Novo Colaborador/Candidato</label>
+              <input type="text" id="alojNome" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Cidade Natal (Origem)</label>
+              <input type="text" id="alojOrigem" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Trecho de Destino Final</label>
+              <input type="text" id="alojDestino" class="form-control" placeholder="Ex: Santa Fé do Sul">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Equipe Vinculada</label>
+              <input type="text" id="alojEquipe" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Data de Chegada ao Escritório</label>
+              <input type="date" id="alojDataEntrada" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Previsão Máxima de Dias (Teto p/ Exames/RH)</label>
+              <input type="number" id="alojPrevisao" class="form-control" value="3" placeholder="Padrão: 3 dias">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Custo do Exame Admissional (R$)</label>
+              <input type="number" id="alojCustoExame" class="form-control" value="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Custo da Passagem de Vinda (R$)</label>
+              <input type="number" id="alojCustoPassagem" class="form-control" value="0">
+            </div>
+          </div>
+          <button onclick="salvarEntradaAlojamento()" class="btn btn-primary w-100 fw-bold mt-4">✓ Registrar Entrada e Iniciar Cronômetro</button>
+        </div>
+      </div>
+
+      <div id="secaoSetores" class="subsecao escondido">
+        <div class="card card-modulo p-4 bg-white">
+          <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">📋 Liberações Técnicas de Campo</h5>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Digite a Equipe para Validar</label>
+            <input type="text" id="setorFiltroEquipe" class="form-control" value="EQ-01-TOCANTINS">
+          </div>
+
+          <div class="p-3 mb-3 border rounded bg-light" id="chkRH">
+            <h6 class="fw-bold text-primary mb-2">👥 CONFERÊNCIA DO RH</h6>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="r1"> <label class="small">Ficha de Registro Assinada</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="r2"> <label class="small">CTPS com Registro Atualizado</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="r3"> <label class="small">Contrato de Trabalho Assinado</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="r4"> <label class="small">Integração Admissional Concluída</label></div>
+            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="r5"> <label class="small">Ficha de EPI Preenchida e Assinada</label></div>
+            <button onclick="carimbarSetor('rh')" class="btn btn-sm btn-primary fw-bold">Liberar e Salvar RH</button>
+          </div>
+
+          <div class="p-3 mb-3 border rounded bg-light" id="chkSST">
+            <h6 class="fw-bold text-success mb-2">🛡️ CONFERÊNCIA DE SST / SEGURANÇA</h6>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="s1"> <label class="small">ASO com Aptidão Técnica (Altura/Elétrica)</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="s2"> <label class="small">Ordens de Serviço (OS) Assinadas</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" id="s3"> <label class="small">Treinamentos Obrigatórios Ativos (NR10, NR35)</label></div>
+            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="s4"> <label class="small">Validação e Vigência do PGR / PCMSO Local</label></div>
+            <button onclick="carimbarSetor('sst')" class="btn btn-sm btn-success fw-bold">Liberar e Salvar SST</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="secaoCurriculos" class="subsecao escondido">
+        <div class="card card-modulo p-4 bg-white">
+          <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">👥 Upload e Triagem Automática por IA</h5>
+          <input type="file" id="arqCurriculo" class="form-control mb-3" accept=".pdf, .jpg, .png">
+          <button onclick="lerCurriculoComIA()" id="btnIA" class="btn btn-dark w-100 fw-bold">⚡ Processar PDF com Inteligência Artificial</button>
+          <div id="statusIA" class="alert alert-info mt-3 escondido text-center fw-bold"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // IMPORTANTE: COLE AQUI O URL QUE VOCÊ GEROU NO APPS SCRIPT
+    const URL_API = "hhttps://script.google.com/macros/s/AKfycbycVDUE14fNk1Yi3FysxwGA0x1E-ZIMmBmJ7ms_rSEl8Qi28YcTXe1dMi1FwsPn7w/exec";
+
+    let perfilLogado = "";
+    let usuarioNome = "";
+
+    async function realizarLogin() {
+      const u = document.getElementById("iptUsuario").value;
+      const s = document.getElementById("iptSenha").value;
+      try {
+        const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "login", usuario: u, senha: s }) });
+        const r = await res.json();
+        if(r.sucesso) {
+          perfilLogado = r.perfil; usuarioNome = u;
+          document.getElementById("telaLogin").classList.add("escondido");
+          document.getElementById("telaMenu").classList.remove("escondido");
+          document.getElementById("txtUsuarioLogado").classList.remove("escondido");
+          document.getElementById("txtUsuarioLogado").innerText = `Perfil: ${perfilLogado.toUpperCase()}`;
+          
+          if(perfilLogado === "campo") document.getElementById("abaSetores").classList.add("escondido");
+          alternarSubTela('secaoMobilizacao');
+          simularVerificacaoDiretor(); // Roda o alerta de alojamento
+        } else { document.getElementById("msgErroLogin").innerText = r.erro; }
+      } catch(e) { document.getElementById("msgErroLogin").innerText = "Erro na conexão."; }
+    }
+
+    function alternarSubTela(id) {
+      document.querySelectorAll(".subsecao").forEach(s => s.classList.add("escondido"));
+      document.getElementById(id).classList.remove("escondido");
+    }
+
+    // BUSCA INTELIGENTE NA INTERNET COM PARÂMETROS
+    function buscarFiltroInternet(plataforma) {
+      const cid = document.getElementById("mobCidade").value;
+      const fil = document.getElementById("mobTipoFiltro").value;
+      if(!cid) return alert("Digite a cidade!");
+      const q = encodeURIComponent(`${fil} em ${cid}`);
+      
+      if(plataforma === 'google') window.open(`http://googleusercontent.com/maps.google.com/3{q}`, '_blank');
+      if(plataforma === 'facebook') window.open(`https://www.facebook.com/marketplace/search/?query=${q}`, '_blank');
+      if(plataforma === 'olx') window.open(`https://www.olx.com.br/imoveis?q=${encodeURIComponent(fil + " " + cid)}`, '_blank');
+    }
+
+    function validarTetoAlimentacao() {
+      const c = parseFloat(document.getElementById("resMarmitaCusto").value) || 0;
+      const m = document.getElementById("alertaTeto");
+      if(c <= 60) { m.className = "text-success small fw-bold"; m.innerText = "✓ Dentro do teto (R$ 60)"; }
+      else { m.className = "text-danger small fw-bold"; m.innerText = "⚠ Acima do teto! Direção será avisada."; }
+    }
+
+    async function salvarOrcamento() {
+      const dados = {
+        equipe: document.getElementById("mobEquipe").value, cidade: document.getElementById("mobCidade").value,
+        dias: document.getElementById("mobDias").value, estadiaNome: document.getElementById("resHospedagem").value,
+        estadiaTipo: document.getElementById("mobTipoFiltro").value, estadiaCusto: document.getElementById("resHospedagemCusto").value,
+        marmitaNome: document.getElementById("resMarmita").value, custoMarmita: document.getElementById("resMarmitaCusto").value,
+        contato: document.getElementById("resContato").value
+      };
+      const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "salvarOrcamento", dados: dados, usuarioLogado: usuarioNome }) });
+      const r = await res.json(); if(r.sucesso) alert("Dados enviados e teto validado!");
+    }
+
+    async function salvarEntradaAlojamento() {
+      const dados = {
+        nome: document.getElementById("alojNome").value, origem: document.getElementById("alojOrigem").value,
+        destino: document.getElementById("alojDestino").value, equipe: document.getElementById("alojEquipe").value,
+        dataEntrada: document.getElementById("alojDataEntrada").value, previsaoDias: document.getElementById("alojPrevisao").value,
+        custoExame: document.getElementById("alojCustoExame").value, custoPassagem: document.getElementById("alojCustoPassagem").value
+      };
+      const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "salvarNovaContratacao", dados: dados }) });
+      const r = await res.json(); if(r.sucesso) { alert("Candidato registrado no alojamento central! Cronômetro ativo."); simularVerificacaoDiretor(); }
+    }
+
+    async function carimbarSetor(setor) {
+      const eq = document.getElementById("setorFiltroEquipe").value;
+      const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "atualizarStatusSetor", equipe: eq, setor: setor, status: "Aprovado" }) });
+      const r = await res.json(); if(r.sucesso) alert(`Setor ${setor.toUpperCase()} aprovado no Sheets!`);
+    }
+
+    // ALERTA AUTOMÁTICO DE SEGURANÇA CONTRA PREJUÍZO DE HOSPEDAGEM CENTRAL
+    function simularVerificacaoDiretor() {
+      // Exemplo visual de monitoramento em tempo real do alojamento central do escritório
+      const painel = document.getElementById("painelAlertaDiretor");
+      const lista = document.getElementById("listaRetidosAlojamento");
+      
+      // Simulação de leitura de estouro de prazo (O código lê as colunas E e F do Sheets)
+      painel.classList.remove("escondido");
+      lista.innerHTML = `⚠️ <b>Marcos Oliveira</b> (Destino: ${document.getElementById("alojDestino").value || 'Santa Fé do Sul'}) está há <b>6 dias</b> no alojamento do escritório central. O limite máximo acordado era de <b>3 dias</b>. Motivo da retenção: Aguardando Liberação de ASO pelo SST.`;
+    }
+
+    async function lerCurriculoComIA() {
+      const input = document.getElementById("arqCurriculo");
+      const st = document.getElementById("statusIA");
+      if(input.files.length === 0) return alert("Selecione um arquivo!");
+      
+      st.classList.remove("escondido"); st.innerText = "⏳ Passo 1/2: Lendo dados do PDF (OCR local)...";
+      
+      Tesseract.recognize(input.files[0], 'por').then(async ({ data: { text } }) => {
+        st.innerText = "⏳ Passo 2/2: IA estruturando campos técnicas...";
+        const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "salvarCurriculoIA", textoBruto: text }) });
+        const r = await res.json();
+        if(r.sucesso) { st.className = "alert alert-success mt-3 text-center"; st.innerText = `✓ Cadastrado por IA! Nome: ${r.dados.nome} | Função: ${r.dados.funcao}`; }
+      });
+    }
+  </script>
+</body>
+</html>

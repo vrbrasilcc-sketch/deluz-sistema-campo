@@ -311,6 +311,36 @@
         if(r.sucesso) { st.className = "alert alert-success mt-3 text-center"; st.innerText = `✓ Cadastrado por IA! Nome: ${r.dados.nome} | Função: ${r.dados.funcao}`; }
       });
     }
+    // ATIVADOR DE NOTIFICAÇÕES (RODA AO INICIAR O APP)
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      console.log('Service Worker Registrado com Sucesso!', reg);
+      
+      // Solicita permissão para enviar notificações no celular
+      Notification.requestPermission().then(function(permissao) {
+        if (permissao === 'granted') {
+          console.log('Permissão para notificações concedida pelo usuário!');
+        }
+      });
+    }).catch(function(err) {
+      console.error('Erro ao registrar o Service Worker:', err);
+    });
+  });
+}
+
+// Função interna para disparar a notificação visual na tela
+function dispararNotificacaoLocal(titulo, texto) {
+  if (Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification(titulo, {
+        body: texto,
+        icon: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png',
+        vibrate: [200, 100, 200]
+      });
+    });
+  }
+}
   </script>
 </body>
 </html>

@@ -5,36 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deluz - Gestão de Equipes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
   <style>
-    body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; }
-    .navbar-deluz { background-color: #004a8d; color: white; position: fixed; width: 100%; top: 0; z-index: 1030; height: 60px; }
-    
-    /* MENU LATERAL (SIDEBAR) */
-    .sidebar { position: fixed; top: 0; bottom: 0; left: -280px; width: 280px; z-index: 1040; background-color: #ffffff; box-shadow: 4px 0 12px rgba(0,0,0,0.15); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding-top: 20px; }
+    body { background-color: #f1f5f9; font-size: 16px; font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
+    .navbar-deluz { background-color: #004a8d; color: white; position: fixed; width: 100%; top: 0; z-index: 1030; height: 65px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .navbar-deluz span { font-size: 1.1rem; }
+    .sidebar { position: fixed; top: 0; bottom: 0; left: -290px; width: 290px; z-index: 1040; background-color: #ffffff; box-shadow: 4px 0 15px rgba(0,0,0,0.15); transition: all 0.3s ease; padding-top: 20px; }
     .sidebar.ativo { left: 0; }
-    .sidebar .nav-link { color: #475569; font-weight: 600; padding: 12px 20px; border-radius: 8px; margin: 4px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+    .sidebar .nav-link { color: #475569; font-weight: 600; font-size: 1.05rem; padding: 14px 20px; border-radius: 8px; margin: 5px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
     .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #e0f2fe; color: #0369a1; }
-    .sidebar .btn-sair { color: #dc2626; border-top: 1px solid #e2e8f0; margin-top: auto; padding-top: 15px; }
-    .sidebar .btn-sair:hover { background-color: #fef2f2; }
-    
+    .sidebar .btn-sair { color: #dc2626; border-top: 1px solid #edf2f7; margin-top: auto; padding-top: 20px; }
     .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 1035; display: none; }
     .overlay.ativo { display: block; }
     
-    .conteudo-principal { margin-top: 80px; padding: 15px; margin-bottom: 50px; }
-    .card-deluz { border-radius: 12px; border: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.04); background: white; margin-bottom: 20px; }
+    /* Gerenciamento de margem do topo dinâmico */
+    .conteudo-principal { margin-top: 30px; padding: 15px; margin-bottom: 60px; }
+    .logado-topo { margin-top: 90px !important; }
+    
+    .card-deluz { border-radius: 16px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; padding: 24px !important; }
+    .secao-titulo { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    .form-label { font-weight: 600; color: #334155; font-size: 0.95rem; margin-bottom: 6px; }
+    .form-control, .form-select { font-size: 1.05rem; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; background-color: #f8fafc; }
+    .form-control:focus, .form-select:focus { border-color: #3b82f6; background-color: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    .sub-bloco { background-color: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #004a8d; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+    .sub-bloco h6 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
     .escondido { display: none !important; }
     
-    .secao-titulo { border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 20px; font-weight: 700; color: #1e3a8a; }
-    .sub-bloco { background-color: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #3b82f6; }
-    .linha-item-check { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #cbd5e1; }
+    /* LAYOUT MATRICIAL ROBUSTO (C, NC, NA) */
+    .container-item-checklist { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .titulo-item-checklist { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
+    .grupo-botoes-status { display: flex; gap: 8px; margin-bottom: 12px; }
+    .btn-status { flex: 1; font-weight: 700; font-size: 0.95rem; padding: 11px 5px; border: 2px solid #cbd5e1; border-radius: 8px; background: #fff; color: #64748b; transition: all 0.2s; text-align: center; cursor: pointer; }
+    .btn-status.conf { border-color: #10b981; color: #10b981; }
+    .btn-status.conf.active { background: #10b981; color: #fff; box-shadow: 0 3px 6px rgba(16,185,129,0.3); }
+    .btn-status.nconf { border-color: #ef4444; color: #ef4444; }
+    .btn-status.nconf.active { background: #ef4444; color: #fff; box-shadow: 0 3px 6px rgba(239,68,68,0.3); }
+    .btn-status.na { border-color: #94a3b8; color: #94a3b8; }
+    .btn-status.na.active { background: #94a3b8; color: #fff; box-shadow: 0 3px 6px rgba(148,163,184,0.3); }
+    .txt-obs-generosa { width: 100%; min-height: 85px; font-size: 1.05rem; border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1; background: #f8fafc; resize: vertical; }
   </style>
 </head>
 <body>
 
-  <nav class="navbar navbar-deluz px-3 d-flex align-items-center justify-content-between">
-    <button class="btn text-white fs-4 p-0 m-0 id-btn-menu escondido" onclick="alternarSidebar()">☰</button>
-    <span class="fw-bold m-auto fs-6">⚡ DELUZ - GESTÃO DE EQUIPES</span>
-    <span id="badgePerfil" class="badge bg-white text-dark p-2 escondido"></span>
+  <nav id="barraTopoNav" class="navbar navbar-deluz px-3 d-flex align-items-center justify-content-between escondido">
+    <button class="btn text-white fs-3 p-0 m-0 id-btn-menu" onclick="alternarSidebar()">☰</button>
+    <span class="fw-bold m-auto">⚡ DELUZ - GESTÃO DE EQUIPES</span>
+    <span id="badgePerfil" class="badge bg-white text-dark p-2"></span>
   </nav>
 
   <div id="sidebarMenu" class="sidebar d-flex flex-column">
@@ -46,214 +62,277 @@
     <nav class="nav flex-column flex-grow-1">
       <a class="nav-link active" id="lnkContratar" onclick="navegar('moduloContratacao')">🆕 Nova Contratação</a>
       <a class="nav-link" id="lnkRh" onclick="navegar('moduloRH')">👥 Checklist RH / DP</a>
-      <a class="nav-link" id="lnkLogistica" onclick="navegar('moduloLogistica')">📦 Logística & Chegada (1.1.1 / 1.1.2)</a>
-      <a class="nav-link" id="lnkCampo" onclick="navegar('moduloCampo')">🤠 Escritório para o Campo (1.1.3)</a>
+      <a class="nav-link" id="lnkLogistica" onclick="navegar('moduloLogistica')">📦 Logística & Chegada</a>
+      <a class="nav-link" id="lnkCampo" onclick="navegar('moduloCampo')">🤠 Escritório para o Campo</a>
       <a class="nav-link" id="lnkMobilizacao" onclick="navegar('moduloMobilizacaoExistente')">🔄 Equipe Existente (Inter-Obras)</a>
-      
       <a class="nav-link btn-sair" onclick="logout()">🚪 Sair do Aplicativo</a>
     </nav>
   </div>
   <div id="overlayMenu" class="overlay" onclick="alternarSidebar()"></div>
 
-  <div class="container conteudo-principal" style="max-width: 750px;">
+  <div id="wrapperConteudo" class="container conteudo-principal" style="max-width: 750px;">
 
-    <div id="telaLogin" class="card card-deluz p-4 mx-auto mt-4" style="max-width: 400px;">
+    <div id="telaLogin" class="card card-deluz p-4 mx-auto mt-5" style="max-width: 420px;">
       <div class="text-center mb-4"><img src="deluzps_logo.jpg" alt="Deluz" class="img-fluid" style="max-height: 85px;"></div>
-      <h6 class="fw-bold text-center text-secondary mb-4">Gestão Centralizada - Deluz Prestadora de Serviços</h6>
+      <h5 class="fw-bold text-center text-secondary mb-4">Acesso ao Sistema Centralizado</h5>
       <div class="mb-3">
-        <label class="form-label small fw-bold">Usuário</label>
-        <input type="text" id="iptUsuario" class="form-control" placeholder="Usuário">
+        <label class="form-label">Usuário</label>
+        <input type="text" id="iptUsuario" class="form-control" placeholder="Digite seu usuário">
       </div>
       <div class="mb-4">
-        <label class="form-label small fw-bold">Senha</label>
+        <label class="form-label">Senha</label>
         <div class="input-group">
           <input type="password" id="iptSenha" class="form-control" placeholder="••••••••">
           <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha()">👁️</button>
         </div>
       </div>
-      <button onclick="realizarLogin()" class="btn btn-primary w-100 fw-bold py-2" style="background-color: #004a8d;">Entrar</button>
+      <button onclick="realizarLogin()" class="btn btn-primary w-100 fw-bold py-2 fs-5" style="background-color: #004a8d; border-radius: 10px;">Entrar</button>
       <div id="msgErroLogin" class="text-danger text-center small mt-3 fw-bold"></div>
     </div>
 
     <div id="areaInterna" class="escondido">
 
-      <div id="moduloContratacao" class="subsecao card card-deluz p-4">
+      <div id="moduloContratacao" class="subsecao card card-deluz">
         <h5 class="secao-titulo">🆕 Nova Contratação</h5>
-        
         <div class="sub-bloco">
-          <h6 class="fw-bold text-dark mb-3">👤 Dados Pessoais do Colaborador</h6>
-          <div class="row g-2">
-            <div class="col-12"><label class="form-label small m-0 fw-bold">Nome do Colaborador</label><input type="text" id="ncNome" class="form-control form-control-sm"></div>
-            <div class="col-md-5"><label class="form-label small m-0 fw-bold">Cidade</label><input type="text" id="ncCidade" class="form-control form-control-sm"></div>
-            <div class="col-md-3"><label class="form-label small m-0 fw-bold">Estado</label><input type="text" id="ncEstado" class="form-control form-control-sm" placeholder="Ex: TO"></div>
-            <div class="col-md-4"><label class="form-label small m-0 fw-bold">Telefone</label><input type="text" id="ncTelefone" class="form-control form-control-sm" placeholder="(00) 00000-0000"></div>
+          <h6 class="text-dark">👤 Dados Pessoais do Colaborador</h6>
+          <div class="row g-3">
+            <div class="col-12"><label class="form-label">Nome do Colaborador</label><input type="text" id="ncNome" class="form-control"></div>
+            <div class="col-md-4">
+              <label class="form-label">Estado Origem</label>
+              <select id="ncEstado" class="form-select" onchange="carregarCidades('ncEstado', 'ncCidade')"><option value="">-- UF --</option></select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Cidade Origem</label>
+              <select id="ncCidade" class="form-select"><option value="">-- Selecione a UF --</option></select>
+            </div>
+            <div class="col-12"><label class="form-label">Telefone de Contato</label><input type="text" id="ncTelefone" class="form-control" placeholder="(00) 00000-0000"></div>
           </div>
         </div>
-
+        
         <div class="sub-bloco" style="border-left-color: #10b981;">
-          <h6 class="fw-bold text-dark mb-3">💼 Informações do Local de Trabalho</h6>
-          <div class="row g-2">
-            <div class="col-md-6"><label class="form-label small m-0 fw-bold">Supervisor</label><input type="text" id="ncSupervisor" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="form-label small m-0 fw-bold">Encarregado</label><input type="text" id="ncEncarregado" class="form-control form-control-sm"></div>
-            <div class="col-md-4"><label class="form-label small m-0 fw-bold">Contrato</label><input type="text" id="ncContrato" class="form-control form-control-sm"></div>
-            <div class="col-md-4"><label class="form-label small m-0 fw-bold">Equipe</label><input type="text" id="ncEquipe" class="form-control form-control-sm"></div>
-            <div class="col-md-4"><label class="form-label small m-0 fw-bold">Cidade Alojamento</label><input type="text" id="ncCidAloj" class="form-control form-control-sm"></div>
+          <h6 class="text-dark">💼 Distribuição e Alocação Inicial</h6>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Supervisor Atribuído</label><input type="text" id="ncSupervisor" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Encarregado Técnico</label><input type="text" id="ncEncarregado" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Contrato Ativo</label><input type="text" id="ncContrato" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Código da Equipe</label><input type="text" id="ncEquipe" class="form-control"></div>
+            <div class="col-12">
+              <label class="form-label">Cidade Destino (Alojamento)</label>
+              <select id="ncCidAloj" class="form-select"><option value="">-- Aguardando UF de Origem --</option></select>
+            </div>
           </div>
         </div>
-
-        <div class="d-flex gap-2 mt-3">
-          <button onclick="adicionarListaTemporaria()" class="btn btn-outline-secondary btn-sm fw-bold w-50">➕ Adicionar outro Colaborador</button>
-          <button onclick="dispararNovaContratacao()" class="btn btn-primary btn-sm fw-bold w-50" style="background-color: #004a8d;">🚀 Enviar e Notificar Setores</button>
+        <div class="d-flex flex-column gap-2 mt-3">
+          <button onclick="adicionarListaTemporaria()" class="btn btn-outline-secondary fw-bold py-2">➕ Adicionar Colaborador ao Lote</button>
+          <button onclick="dispararNovaContratacao()" class="btn btn-primary fw-bold py-3 fs-5" style="background-color: #004a8d; border-radius: 12px;">🚀 Finalizar e Enviar Solicitação</button>
         </div>
-
         <div class="mt-4 border-top pt-3" id="blocoListaTemp">
-          <h6 class="fw-bold text-secondary">Colaboradores Pendentes de Envio neste Lote:</h6>
-          <ul class="list-group list-group-numbered small" id="listaTempContratados"></ul>
+          <h6 class="fw-bold text-secondary">Integrantes Cadastrados neste Lote:</h6>
+          <ul class="list-group list-group-numbered" id="listaTempContratados"></ul>
         </div>
       </div>
 
-      <div id="moduloRH" class="subsecao escondido card card-deluz p-4">
-        <h5 class="secao-titulo">👥 Checklist de Admissão - Departamento de RH</h5>
-        <div class="mb-3 p-2 bg-light border rounded">
-          <label class="small fw-bold text-secondary">Selecione o Candidato Notificado:</label>
-          <select id="selectFiltroRH" class="form-select form-select-sm">
-            <option value="">-- Escolha o colaborador na esteira --</option>
-          </select>
+      <div id="moduloRH" class="subsecao escondido card card-deluz">
+        <h5 class="secao-titulo">👥 Validação Cadastral - Setor RH / DP</h5>
+        <div class="mb-4 p-3 bg-light border rounded-3">
+          <label class="form-label text-primary">Selecione o Profissional Notificado:</label>
+          <select id="selectFiltroRH" class="form-select"></select>
         </div>
-
-        <div class="p-3 border rounded bg-white mt-2">
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c1" class="form-check-input me-2"><span class="small fw-bold">Documentação</span></div><input type="text" id="rh_o1" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c2" class="form-check-input me-2"><span class="small fw-bold">Exames laborais</span></div><input type="text" id="rh_o2" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c3" class="form-check-input me-2"><span class="small fw-bold">Registro</span></div><input type="text" id="rh_o3" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c4" class="form-check-input me-2"><span class="small fw-bold">SST</span></div><input type="text" id="rh_o4" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c5" class="form-check-input me-2"><span class="small fw-bold">Plataforma de liberação</span></div><input type="text" id="rh_o5" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="rh_c6" class="form-check-input me-2"><span class="small fw-bold">Integração de Ponto</span></div><input type="text" id="rh_o6" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <button onclick="concluirEtapaRH()" class="btn btn-success btn-sm w-100 fw-bold mt-3">✓ Concluir e Liberar para Logística</button>
-        </div>
+        <div id="containerItensRH"></div>
+        <button onclick="concluirEtapaRH()" class="btn btn-success btn-lg w-100 fw-bold mt-4 shadow-sm">✓ Concluir Análise e Encaminhar</button>
       </div>
 
-      <div id="moduloLogistica" class="subsecao escondido card card-deluz p-4">
-        <h5 class="secao-titulo">📦 1.1 Logística da Nova Contratação</h5>
-        <div class="mb-3 p-2 bg-light border rounded">
-          <label class="small fw-bold text-secondary">Colaboradores Aprovados pelo RH:</label>
-          <select id="selectFiltroLog" class="form-select form-select-sm">
-            <option value="">-- Selecione o Colaborador Liberado pelo RH --</option>
-          </select>
+      <div id="moduloLogistica" class="subsecao escondido card card-deluz">
+        <h5 class="secao-titulo">📦 Logística Operacional e Integração</h5>
+        <div class="mb-3 p-3 bg-light border rounded-3">
+          <label class="form-label text-primary">Colaboradores Aptos para Viagem:</label>
+          <select id="selectFiltroLog" class="form-select"></select>
         </div>
-
         <div class="sub-bloco" style="border-left-color: #eab308;">
-          <h6 class="fw-bold text-dark"><span class="badge bg-warning text-dark">1.1.1</span> Origem até o Escritório da Deluz</h6>
-          <div class="row g-2">
-            <div class="col-md-6"><label class="small fw-bold m-0">Previsão de Saída</label><input type="date" id="logSaida" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Previsão de Chegada</label><input type="date" id="logChegada" class="form-control form-control-sm"></div>
-            <div class="col-md-4"><label class="small fw-bold m-0">Valor Passagem (R$)</label><input type="number" id="logPassagem" class="form-control form-control-sm" placeholder="0.00"></div>
-            <div class="col-md-4"><label class="small fw-bold m-0">Custo Hospedagem (R$)</label><input type="number" id="logHospedagem" class="form-control form-control-sm" placeholder="0.00"></div>
-            <div class="col-md-4"><label class="small fw-bold m-0">Permanência Estipada (Dias)</label><input type="number" id="logDias" class="form-control form-control-sm" placeholder="Ex: 5"></div>
+          <h6 class="text-dark">📅 Planejamento de Deslocamento e Custos (6 Diretrizes)</h6>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Previsão Saída Origem</label><input type="date" id="logSaida" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Previsão Chegada Escritório</label><input type="date" id="logChegada" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Custo Passagem (R$)</label><input type="number" id="logPassagem" class="form-control" placeholder="0.00"></div>
+            <div class="col-md-6"><label class="form-label">Custo Hospedagem Transitória (R$)</label><input type="number" id="logHospedagem" class="form-control" placeholder="0.00"></div>
+            <div class="col-md-6"><label class="form-label">Permanência Prevista (Dias)</label><input type="number" id="logDias" class="form-control" placeholder="Ex: 3"></div>
+            <div class="col-md-6"><label class="form-label">Previsão Deslocamento Trecho</label><input type="date" id="logDeslocamento" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Previsão Integração Cliente</label><input type="date" id="logIntegContratante" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Efetivo Início Atividades</label><input type="date" id="logInicioAtividades" class="form-control"></div>
           </div>
         </div>
-
         <div class="sub-bloco" style="border-left-color: #ef4444;">
-          <h6 class="fw-bold text-dark"><span class="badge bg-danger text-white">1.1.2</span> Checklist de Chegada no Escritório</h6>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c1" class="form-check-input me-2"><span class="small fw-bold">Segurança do Trabalho (Documentação)</span></div><input type="text" id="seg_o1" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c2" class="form-check-input me-2"><span class="small fw-bold">Separação de EPIs</span></div><input type="text" id="seg_o2" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c3" class="form-check-input me-2"><span class="small fw-bold">Separação de EPCs</span></div><input type="text" id="seg_o3" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c4" class="form-check-input me-2"><span class="small fw-bold">Utensílios domésticos</span></div><input type="text" id="seg_o4" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c5" class="form-check-input me-2"><span class="small fw-bold">Integração</span></div><input type="text" id="seg_o5" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c6" class="form-check-input me-2"><span class="small fw-bold">Entrega de materiais</span></div><input type="text" id="seg_o6" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c7" class="form-check-input me-2"><span class="small fw-bold">Treinamentos NRs</span></div><input type="text" id="seg_o7" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c8" class="form-check-input me-2"><span class="small fw-bold">Aparelho celular</span></div><input type="text" id="seg_o8" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c9" class="form-check-input me-2"><span class="small fw-bold">Treinamento inicial Check Mob</span></div><input type="text" id="seg_o9" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c10" class="form-check-input me-2"><span class="small fw-bold">Veículo de trabalho</span></div><input type="text" id="seg_o10" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c11" class="form-check-input me-2"><span class="small fw-bold">Máquinas e equipamentos</span></div><input type="text" id="seg_o11" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c12" class="form-check-input me-2"><span class="small fw-bold">LPU (Licença de Porte e Uso)</span></div><input type="text" id="seg_o12" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c13" class="form-check-input me-2"><span class="small fw-bold">LO (Licença de Operação)</span></div><input type="text" id="seg_o13" class="form-control form-control-sm w-40" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="seg_c14" class="form-check-input me-2"><span class="small fw-bold">Integração com a contratante</span></div><input type="text" id="seg_o14" class="form-control form-control-sm w-40" placeholder="Obs"></div>
+          <h6 class="text-dark">🛡️ Checklist de Chegada (Segurança e Infraestrutura)</h6>
+          <div id="containerItensSegurança"></div>
         </div>
-        <button onclick="concluirLogisticaESeguranca()" class="btn btn-primary btn-sm w-100 fw-bold">🚀 Concluir Logística e Notificar Supervisor de Campo</button>
+        <button onclick="concluirLogisticaESeguranca()" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">🚀 Liberar Profissional para o Campo</button>
       </div>
 
-      <div id="moduloCampo" class="subsecao escondido card card-deluz p-4">
-        <h5 class="secao-titulo">🤠 1.1.3 Escritório para o Local de Trabalho</h5>
-        <div class="mb-3 p-2 bg-light border rounded">
-          <label class="small fw-bold text-secondary">Equipes Prontas para Campo:</label>
-          <select id="selectFiltroCampo" class="form-select form-select-sm" onchange="puxarDadosAutomaticosCampo()">
-            <option value="">-- Aguardando Liberação das Etapas Anteriores --</option>
-          </select>
+      <div id="moduloCampo" class="subsecao escondido card card-deluz">
+        <h5 class="secao-titulo">🤠 Gestão e Estruturação de Alojamento</h5>
+        <div class="mb-3 p-3 bg-light border rounded-3">
+          <label class="form-label text-primary">Equipes Prontas para o Trecho:</label>
+          <select id="selectFiltroCampo" class="form-select" onchange="puxarDadosAutomaticosCampo()"></select>
         </div>
-
-        <div class="row g-2 mb-3 bg-light p-3 border rounded">
-          <h6 class="fw-bold text-muted m-0">📋 Dados Herdados Automaticamente:</h6>
-          <div class="col-md-6"><span class="small d-block text-secondary">Equipe:</span><input type="text" id="autoEquipe" class="form-control form-control-sm bg-white" readonly></div>
-          <div class="col-md-6"><span class="small d-block text-secondary">Cidade Alojamento:</span><input type="text" id="autoCid" class="form-control form-control-sm bg-white" readonly></div>
+        <div class="row g-3 mb-4 bg-light p-3 border rounded-3">
+          <div class="col-md-6"><span class="small fw-bold text-secondary d-block">Equipe vinculada:</span><input type="text" id="autoEquipe" class="form-control bg-white" readonly></div>
+          <div class="col-md-6"><span class="small fw-bold text-secondary d-block">Ponto de Alojamento:</span><input type="text" id="autoCid" class="form-control bg-white" readonly></div>
         </div>
-
         <div class="sub-bloco" style="border-left-color: #8b5cf6;">
-          <h6 class="fw-bold text-dark mb-3">🛠️ Complementação do Supervisor de Campo</h6>
-          <div class="mb-2">
-            <label class="small fw-bold">Tipo de Estabelecimento</label>
-            <select id="cpTipoEst" class="form-select form-select-sm">
-              <option value="Hotel">Hotel</option>
-              <option value="Airbnb">Airbnb</option>
-              <option value="Alojamento">Alojamento</option>
-              <option value="Pousada">Pousada</option>
+          <h6 class="text-dark">🛠️ Homologação Físico-Estrutural</h6>
+          <div class="mb-3">
+            <label class="form-label">Tipo de Acomodação Definida</label>
+            <select id="cpTipoEst" class="form-select">
+              <option value="Hotel">Estrutura Hoteleira</option>
+              <option value="Airbnb">Locação por Temporada (Airbnb)</option>
+              <option value="Alojamento">Alojamento Próprio Deluz</option>
+              <option value="Pousada">Pousada Comercial</option>
             </select>
           </div>
-          <div class="mb-2">
-            <label class="small fw-bold">Locais de Refeição (Café da manhã, almoço e jantar)</label>
-            <input type="text" id="cpRefeicao" class="form-control form-control-sm" placeholder="Ex: Restaurante do Posto / Marmitaria Central">
+          <div class="mb-4">
+            <label class="form-label">Restaurantes e Alimentação Homologados</label>
+            <input type="text" id="cpRefeicao" class="form-control" placeholder="Identificação dos fornecedores locais">
           </div>
-          <div class="linha-item-check"><div><input type="checkbox" id="cp_c1" class="form-check-input me-2"><span class="small fw-bold">Mobília de alojamento</span></div><input type="text" id="cp_o1" class="form-control form-control-sm w-50" placeholder="Obs"></div>
-          <div class="linha-item-check"><div><input type="checkbox" id="cp_c2" class="form-check-input me-2"><span class="small fw-bold">Recepção e apresentação do local de trabalho</span></div><input type="text" id="cp_o2" class="form-control form-control-sm w-50" placeholder="Obs"></div>
+          <div id="containerItensCampo"></div>
         </div>
-
-        <div class="bg-light p-2 rounded small text-center border mb-3">
-          🔍 <strong>Pesquisa Rápida Externa de Suporte:</strong><br>
-          <a href="https://maps.google.com" target="_blank" class="btn btn-xs btn-outline-dark px-2 py-0 m-1 text-decoration-none">Google Maps</a> | 
-          <a href="https://www.facebook.com" target="_blank" class="btn btn-xs btn-outline-dark px-2 py-0 m-1 text-decoration-none">Grupos Facebook</a> | 
-          <a href="https://www.olx.com.br" target="_blank" class="btn btn-xs btn-outline-dark px-2 py-0 m-1 text-decoration-none">OLX</a>
-        </div>
-        
-        <button onclick="finalizarGeralCampo()" class="btn btn-warning btn-sm w-100 fw-bold">✓ Consolidar Mobilização e Finalizar</button>
+        <button onclick="finalizarGeralCampo()" class="btn btn-warning btn-lg w-100 fw-bold shadow-sm text-dark">🏁 Consolidar Processo de Mobilização</button>
       </div>
 
-      <div id="moduloMobilizacaoExistente" class="subsecao escondido card card-deluz p-4">
+      <div id="moduloMobilizacaoExistente" class="subsecao card card-deluz escondido">
         <h5 class="secao-titulo">🔄 Mobilização de Equipe Existente (Inter-Obras)</h5>
-        
         <div class="sub-bloco" style="border-left-color: #64748b;">
-          <h6 class="fw-bold text-dark mb-2">📍 Detalhes da Transferência de Campo</h6>
-          <div class="row g-2">
-            <div class="col-12"><label class="small fw-bold m-0">Colaborador</label><input type="text" id="meColab" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Contrato Origem</label><input type="text" id="meContratoOri" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Equipe Origem</label><input type="text" id="meEquipeOri" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Cidade Origem</label><input type="text" id="meCidOri" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Estado Origem</label><input type="text" id="meEstOri" class="form-control form-control-sm"></div>
-            <hr class="my-1 col-12">
-            <div class="col-md-6"><label class="small fw-bold m-0">Contrato Destino</label><input type="text" id="meContratoDest" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Equipe Destino</label><input type="text" id="meEquipeDest" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Cidade Destino</label><input type="text" id="meCidDest" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Estado Destino</label><input type="text" id="meEstDest" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Previsão Saída Origem</label><input type="date" id="meDataSai" class="form-control form-control-sm"></div>
-            <div class="col-md-6"><label class="small fw-bold m-0">Previsão Chegada Destino</label><input type="date" id="meDataCheg" class="form-control form-control-sm"></div>
+          <h6 class="text-dark">📍 Parâmetros de Transferência Operacional</h6>
+          <div class="row g-3">
+            <div class="col-12"><label class="form-label">Nome do Colaborador</label><input type="text" id="meColab" class="form-control"></div>
+            <div class="col-md-4">
+              <label class="form-label">UF Origem</label>
+              <select id="meEstOri" class="form-select" onchange="carregarCidades('meEstOri', 'meCidOri')"><option value="">-- UF --</option></select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Cidade Origem</label>
+              <select id="meCidOri" class="form-select"><option value="">-- Selecione a UF --</option></select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Equipe Origem</label><input type="text" id="meEquipeOri" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Contrato Anterior</label><input type="text" id="meContratoOri" class="form-control"></div>
+            <hr class="col-12 my-2">
+            <div class="col-md-4">
+              <label class="form-label">UF Destino</label>
+              <select id="meEstDest" class="form-select" onchange="carregarCidades('meEstDest', 'meCidDest')"><option value="">-- UF --</option></select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Cidade Destino</label>
+              <select id="meCidDest" class="form-select"><option value="">-- Selecione a UF --</option></select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Equipe Nova</label><input type="text" id="meEquipeDest" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Contrato Alvo</label><input type="text" id="meContratoDest" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Data de Desmobilização</label><input type="date" id="meDataSai" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Data Prevista de Integração</label><input type="date" id="meDataCheg" class="form-control"></div>
           </div>
         </div>
-
         <div class="sub-bloco" style="border-left-color: #10b981;">
-          <h6 class="fw-bold text-dark mb-2">🛡️ Verificação do RH e Segurança do Trabalho</h6>
-          <div class="linha-item-check"><div><input type="checkbox" id="meCheckSeg" class="form-check-input me-2"><span class="small fw-bold">Segurança: Documentação válida na plataforma do contrato de destino</span></div></div>
+          <h6 class="text-dark">🛡️ Liberação Legal e de Segurança</h6>
+          <div class="container-item-checklist">
+            <div class="titulo-item-checklist">Segurança: Documentação válida na plataforma do contrato de destino</div>
+            <div class="grupo-botoes-status">
+              <button class="btn-status conf" id="meBtnC" onclick="setExStatus('C')">CONFORME</button>
+              <button class="btn-status nconf" id="meBtnNC" onclick="setExStatus('NC')">NÃO CONFORME</button>
+            </div>
+          </div>
         </div>
-
-        <button onclick="salvarMobilizacaoExistente()" class="btn btn-secondary btn-sm w-100 fw-bold">✓ Salvar Transferência de Equipe</button>
+        <button onclick="salvarMobilizacaoExistente()" class="btn btn-secondary btn-lg w-100 fw-bold shadow-sm">✓ Efetivar Movimentação de Pessoal</button>
       </div>
 
     </div>
   </div>
 
   <script>
-    // GOOGLE APPS SCRIPT LINK
-    const URL_API = "https://script.google.com/macros/s/AKfycby7Z90BnJwE78BeyNhYebCOZoBUjxay53u-k1mj4Iqme_621Txju7ebguFfnQ7O8gvF/exec";
+    // ⚠️ ATENÇÃO: COLOQUE A SUA URL GERADA NO APPS SCRIPT ENTRE AS ASPAS ABAIXO
+    const URL_API = "SUA_URL_DO_APPS_SCRIPT_AQUI";
     
     let perfilLogado = ""; let usuarioNome = "";
     let loteTemporario = []; let bancoContratacoesMemoria = {};
+    let statusMeGlobal = "PENDENTE";
+
+    const ITENS_RH = ["Documentação de Admissão", "Exames e Laudos Laborais", "Registro em Carteira / Sistema", "Alinhamento SST (PGR/PCMSO)", "Plataforma Interna de Liberação", "Sincronização de Cartão de Ponto"];
+    const ITENS_SEG = ["Documentação de Segurança", "Separação e Entrega de EPIs", "Alocação de EPCs Coletivos", "Kit de Utensílios Domésticos", "Integração Interna Escritório", "Distribuição de Materiais Técnicos", "Treinamento Técnico Normativo (NRs)", "Aparelho Celular Corporativo", "Treinamento Funcional Check Mob", "Disponibilização de Veículo de Trabalho", "Máquinas, Equipamentos e Ferramental", "LPU (Licença para Porte e Uso)", "LO (Licença de Operação)", "Integração Final na Contratante"];
+    const ITENS_CAMPO = ["Condições Gerais de Mobília do Alojamento", "Recepção, Integração e Apresentação do Local de Trabalho"];
+
+    const ESTADOS_BR = [{uf:"AC", nome:"Acre"}, {uf:"AL", nome:"Alagoas"}, {uf:"AP", nome:"Amapá"}, {uf:"AM", nome:"Amazonas"}, {uf:"BA", nome:"Bahia"}, {uf:"CE", nome:"Ceará"}, {uf:"DF", nome:"Distrito Federal"}, {uf:"ES", nome:"Espírito Santo"}, {uf:"GO", nome:"Goiás"}, {uf:"MA", nome:"Maranhão"}, {uf:"MT", nome:"Mato Grosso"}, {uf:"MS", nome:"Mato Grosso do Sul"}, {uf:"MG", nome:"Minas Gerais"}, {uf:"PA", nome:"Pará"}, {uf:"PB", nome:"Paraíba"}, {uf:"PR", nome:"Paraná"}, {uf:"PE", nome:"Pernambuco"}, {uf:"PI", nome:"Piauí"}, {uf:"RJ", nome:"Rio de Janeiro"}, {uf:"RN", nome:"Rio Grande do Norte"}, {uf:"RS", nome:"Rio Grande do Sul"}, {uf:"RO", nome:"Rondônia"}, {uf:"RR", nome:"Roraima"}, {uf:"SC", nome:"Santa Catarina"}, {uf:"SP", nome:"São Paulo"}, {uf:"SE", nome:"Sergipe"}, {uf:"TO", nome:"Tocantins"}];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      ['ncEstado', 'meEstOri', 'meEstDest'].forEach(id => {
+        const s = document.getElementById(id);
+        if(s) ESTADOS_BR.forEach(e => { const o = document.createElement('option'); o.value = e.uf; o.innerText = e.nome; s.appendChild(o); });
+      });
+      renderizarComponentesMatriciais();
+    });
+
+    function renderizarComponentesMatriciais() {
+      renderizarBlocoMatricial("containerItensRH", ITENS_RH, "rh");
+      renderizarBlocoMatricial("containerItensSegurança", ITENS_SEG, "seg");
+      renderizarBlocoMatricial("containerItensCampo", ITENS_CAMPO, "cp");
+    }
+
+    function renderizarBlocoMatricial(containerId, listaItens, prefixo) {
+      const wrapper = document.getElementById(containerId);
+      wrapper.innerHTML = "";
+      listaItens.forEach((texto, index) => {
+        const itemIdx = index + 1;
+        const div = document.createElement("div");
+        div.className = "container-item-checklist";
+        div.innerHTML = `
+          <div class="titulo-item-checklist">${texto}</div>
+          <div class="grupo-botoes-status">
+            <button class="btn-status conf" id="${prefixo}_b_c_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'C')">CONFORME</button>
+            <button class="btn-status nconf" id="${prefixo}_b_nc_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NC')">NÃO CONFORME</button>
+            <button class="btn-status na active" id="${prefixo}_b_na_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NA')">N/A</button>
+          </div>
+          <textarea id="${prefixo}_txt_o_${itemIdx}" class="txt-obs-generosa" placeholder="Campo de observação técnica ou pendências identificadas..."></textarea>
+        `;
+        wrapper.appendChild(div);
+      });
+    }
+
+    let selecoesMemoria = { rh: {}, seg: {}, cp: {} };
+    function atualizarCliqueStatus(prefixo, itemIdx, valorStatus) {
+      selecoesMemoria[prefixo][itemIdx] = valorStatus;
+      document.getElementById(`${prefixo}_b_c_${itemIdx}`).classList.remove("active");
+      document.getElementById(`${prefixo}_b_nc_${itemIdx}`).classList.remove("active");
+      document.getElementById(`${prefixo}_b_na_${itemIdx}`).classList.remove("active");
+      
+      if(valorStatus === 'C') document.getElementById(`${prefixo}_b_c_${itemIdx}`).classList.add("active");
+      if(valorStatus === 'NC') document.getElementById(`${prefixo}_b_nc_${itemIdx}`).classList.add("active");
+      if(valorStatus === 'NA') document.getElementById(`${prefixo}_b_na_${itemIdx}`).classList.add("active");
+    }
+
+    function setExStatus(val) {
+      statusMeGlobal = val;
+      document.getElementById("meBtnC").classList.remove("active");
+      document.getElementById("meBtnNC").classList.remove("active");
+      if(val === 'C') document.getElementById("meBtnC").classList.add("active");
+      if(val === 'NC') document.getElementById("meBtnNC").classList.add("active");
+    }
+
+    async function carregarCidades(idSelectEstado, idSelectCidade) {
+      const uf = document.getElementById(idSelectEstado).value;
+      const selectCidade = document.getElementById(idSelectCidade);
+      selectCidade.innerHTML = '<option value="">-- Carregando base do IBGE... --</option>';
+      if(!uf) { selectCidade.innerHTML = '<option value="">-- Selecione a UF --</option>'; return; }
+      try {
+        const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+        const cidades = await res.json();
+        selectCidade.innerHTML = '<option value="">-- Selecione a Cidade --</option>';
+        cidades.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(cid => {
+          const opt = document.createElement('option'); opt.value = cid.nome; opt.innerText = cid.nome; selectCidade.appendChild(opt);
+        });
+        if(idSelectEstado === 'ncEstado') {
+          const selectAloj = document.getElementById('ncCidAloj');
+          selectAloj.innerHTML = '<option value="">-- Selecione a Cidade --</option>';
+          cidades.forEach(cid => { const opt = document.createElement('option'); opt.value = cid.nome; opt.innerText = cid.nome; selectAloj.appendChild(opt); });
+        }
+      } catch (e) { selectCidade.innerHTML = '<option value="">Falha de conexão com o IBGE</option>'; }
+    }
 
     function alternarSidebar() {
       document.getElementById("sidebarMenu").classList.toggle("ativo");
@@ -264,208 +343,176 @@
       document.querySelectorAll(".subsecao").forEach(s => s.classList.add("escondido"));
       document.getElementById(idSubTela).classList.remove("escondido");
       document.querySelectorAll(".sidebar .nav-link").forEach(l => l.classList.remove("active"));
-      
       const links = { moduloContratacao: 'lnkContratar', moduloRH: 'lnkRh', moduloLogistica: 'lnkLogistica', moduloCampo: 'lnkCampo', moduloMobilizacaoExistente: 'lnkMobilizacao' };
       if(links[idSubTela]) document.getElementById(links[idSubTela]).classList.add("active");
       if(document.getElementById("sidebarMenu").classList.contains("ativo")) alternarSidebar();
     }
 
     function alternarVisibilidadeSenha() {
-      const p = document.getElementById("iptSenha");
-      p.type = p.type === "password" ? "text" : "password";
+      const p = document.getElementById("iptSenha"); p.type = p.type === "password" ? "text" : "password";
     }
 
     async function realizarLogin() {
-      const u = document.getElementById("iptUsuario").value;
-      const s = document.getElementById("iptSenha").value;
-      document.getElementById("msgErroLogin").innerText = "A autenticar...";
-      
+      const u = document.getElementById("iptUsuario").value; const s = document.getElementById("iptSenha").value;
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "login", usuario: u, senha: s }) });
         const r = await res.json();
         if(r.sucesso) {
           perfilLogado = r.perfil; usuarioNome = u;
+          
           document.getElementById("telaLogin").classList.add("escondido");
           document.getElementById("areaInterna").classList.remove("escondido");
-          document.querySelector(".id-btn-menu").classList.remove("escondido");
-          document.getElementById("badgePerfil").classList.remove("escondido");
+          document.getElementById("barraTopoNav").classList.remove("escondido");
+          document.getElementById("wrapperConteudo").classList.add("logado-topo");
+          
           document.getElementById("badgePerfil").innerText = `Perfil: ${perfilLogado.toUpperCase()}`;
-          document.getElementById("msgErroLogin").innerText = "";
           navegar('moduloContratacao');
         } else { document.getElementById("msgErroLogin").innerText = r.erro; }
-      } catch(e) { 
-        document.getElementById("msgErroLogin").innerText = "Erro ao conectar com o banco de dados. Verifique a URL_API."; 
-      }
+      } catch(e) { document.getElementById("msgErroLogin").innerText = "Falha crítica de comunicação."; }
     }
 
     function logout() {
       perfilLogado = ""; usuarioNome = "";
       document.getElementById("areaInterna").classList.add("escondido");
-      document.querySelector(".id-btn-menu").classList.add("escondido");
-      document.getElementById("badgePerfil").classList.add("escondido");
+      document.getElementById("barraTopoNav").classList.add("escondido");
+      document.getElementById("wrapperConteudo").classList.remove("logado-topo");
       document.getElementById("telaLogin").classList.remove("escondido");
       document.getElementById("iptUsuario").value = ""; document.getElementById("iptSenha").value = "";
     }
 
     function adicionarListaTemporaria() {
       const nome = document.getElementById("ncNome").value.trim();
-      if(!nome) return alert("Digite ao menos o nome do colaborador!");
-      
+      if(!nome) return alert("Por favor, digite o nome!");
       const obj = {
         colaborador: nome, cidade: document.getElementById("ncCidade").value, estado: document.getElementById("ncEstado").value,
         telefone: document.getElementById("ncTelefone").value, supervisor: document.getElementById("ncSupervisor").value,
         encarregado: document.getElementById("ncEncarregado").value, contrato: document.getElementById("ncContrato").value,
         equipe: document.getElementById("ncEquipe").value, cidadeAloj: document.getElementById("ncCidAloj").value
       };
-      
       loteTemporario.push(obj);
       const li = document.createElement("li");
-      li.className = "list-group-item py-1 bg-light text-dark d-flex justify-content-between";
-      li.innerText = `${obj.colaborador} (${obj.cidadeAloj})`;
+      li.className = "list-group-item py-2 bg-light font-weight-bold";
+      li.innerText = `${obj.colaborador} (Destino: ${obj.cidadeAloj})`;
       document.getElementById("listaTempContratados").appendChild(li);
       document.getElementById("ncNome").value = "";
     }
 
     async function dispararNovaContratacao() {
-      if(loteTemporario.length === 0) {
-        adicionarListaTemporaria();
-      }
-      
+      if(loteTemporario.length === 0) adicionarListaTemporaria();
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "salvarNovaContratacao", lote: loteTemporario, operador: usuarioNome }) });
         const r = await res.json();
-        
         if(r.sucesso) {
           loteTemporario.forEach(item => {
             bancoContratacoesMemoria[item.colaborador] = item;
-            const optRh = document.createElement("option");
-            optRh.value = item.colaborador; optRh.innerText = item.colaborador;
-            document.getElementById("selectFiltroRH").appendChild(optRh);
+            const opt = document.createElement("option"); opt.value = item.colaborador; opt.innerText = item.colaborador;
+            document.getElementById("selectFiltroRH").appendChild(opt);
           });
-          alert("🚀 Lote cadastrado e enviado para o Sheets com sucesso!");
-          loteTemporario = [];
-          document.getElementById("listaTempContratados").innerHTML = "";
+          alert("Lote enviado com sucesso!");
+          loteTemporario = []; document.getElementById("listaTempContratados").innerHTML = "";
           navegar('moduloRH');
-        } else { alert("Erro da Planilha: " + r.erro); }
-      } catch(e) { alert("Falha na comunicação de rede."); }
+        }
+      } catch(e) { alert("Erro de envio."); }
     }
 
     async function concluirEtapaRH() {
       const colab = document.getElementById("selectFiltroRH").value;
-      if(!colab) return alert("Selecione um colaborador da lista!");
-
-      let checkListArray = [];
+      if(!colab) return alert("Selecione um colaborador!");
+      let dataCheck = [];
       for(let i=1; i<=6; i++) {
-        checkListArray.push({
-          item: i,
-          status: document.getElementById(`rh_c${i}`).checked ? "OK" : "PENDENTE",
-          obs: document.getElementById(`rh_o${i}`).value
-        });
+        dataCheck.push({ item: i, status: selecoesMemoria.rh[i] || "NA", obs: document.getElementById(`rh_txt_o_${i}`).value });
       }
-
       try {
-        const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "atualizarEsteira", etapa: "RH", colaborador: colab, checks: checkListArray }) });
+        const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "atualizarEsteira", etapa: "RH", colaborador: colab, checks: dataCheck }) });
         const r = await res.json();
         if(r.sucesso) {
-          const optLog = document.createElement("option");
-          optLog.value = colab; optLog.innerText = colab;
-          document.getElementById("selectFiltroLog").appendChild(optLog);
-          alert(`✓ Dados de RH salvos para ${colab}! Liberado para Logística.`);
-          navegar('moduloLogistica');
+          const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
+          document.getElementById("selectFiltroLog").appendChild(opt);
+          alert("Aprovado pelo RH. Liberado para Logística!"); navegar('moduloLogistica');
         }
-      } catch(e) { alert("Erro de rede."); }
+      } catch(e) { alert("Erro."); }
     }
 
     async function concluirLogisticaESeguranca() {
       const colab = document.getElementById("selectFiltroLog").value;
       if(!colab) return alert("Selecione o colaborador!");
-
-      let checkListSeg = [];
+      let dataCheckSeg = [];
       for(let i=1; i<=14; i++) {
-        checkListSeg.push({
-          item: i,
-          status: document.getElementById(`seg_c${i}`).checked ? "OK" : "PENDENTE",
-          obs: document.getElementById(`seg_o${i}`).value
-        });
+        dataCheckSeg.push({ item: i, status: selecoesMemoria.seg[i] || "NA", obs: document.getElementById(`seg_txt_o_${i}`).value });
       }
-
       const payload = {
         acao: "atualizarEsteira", etapa: "LOGISTICA", colaborador: colab,
-        saida: document.getElementById("logSaida").value,
-        chegada: document.getElementById("logChegada").value,
-        passagem: document.getElementById("logPassagem").value || 0,
-        hospedagem: document.getElementById("logHospedagem").value || 0,
-        dias: document.getElementById("logDias").value || 0,
-        checksSeg: checkListSeg
+        custoPassagem: document.getElementById("logPassagem").value || 0,
+        custoHospedagem: document.getElementById("logHospedagem").value || 0,
+        prevPermanencia: document.getElementById("logDias").value || 0,
+        prevDeslocamento: document.getElementById("logDeslocamento").value || "",
+        prevIntegracao: document.getElementById("logIntegContratante").value || "",
+        prevInicioAtividades: document.getElementById("logInicioAtividades").value || "",
+        checksSeg: dataCheckSeg
       };
-
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
         if(r.sucesso) {
-          const optCamp = document.createElement("option");
-          optCamp.value = colab; optCamp.innerText = colab;
-          document.getElementById("selectFiltroCampo").appendChild(optCamp);
-          alert("✓ Custos de Logística e Checklist da Segurança gravados!");
-          navegar('moduloCampo');
+          const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
+          document.getElementById("selectFiltroCampo").appendChild(opt);
+          alert("Logística e Segurança consolidadas!"); navegar('moduloCampo');
         }
-      } catch(e) { alert("Erro de rede."); }
+      } catch(e) { alert("Erro."); }
     }
 
     function puxarDadosAutomaticosCampo() {
       const colab = document.getElementById("selectFiltroCampo").value;
       if(!colab || !bancoContratacoesMemoria[colab]) return;
-      const dados = bancoContratacoesMemoria[colab];
-      document.getElementById("autoEquipe").value = dados.equipe || "";
-      document.getElementById("autoCid").value = `${dados.cidadeAloj || ""} - ${dados.estado || ""}`;
+      const d = bancoContratacoesMemoria[colab];
+      document.getElementById("autoEquipe").value = d.equipe || "";
+      document.getElementById("autoCid").value = `${d.cidadeAloj || ""} - ${d.estado || ""}`;
     }
 
     async function finalizarGeralCampo() {
       const colab = document.getElementById("selectFiltroCampo").value;
-      if(!colab) return alert("Selecione uma equipe!");
-
+      if(!colab) return alert("Selecione o colaborador!");
       const payload = {
         acao: "atualizarEsteira", etapa: "CAMPO", colaborador: colab,
-        tipoEst: document.getElementById("cpTipoEst").value,
-        refeicao: document.getElementById("cpRefeicao").value,
-        checkMobiliaStatus: document.getElementById("cp_c1").checked ? "OK" : "PENDENTE",
-        checkMobiliaObs: document.getElementById("cp_o1").value,
-        checkRecepcaoStatus: document.getElementById("cp_c2").checked ? "OK" : "PENDENTE",
-        checkRecepcaoObs: document.getElementById("cp_o2").value
+        tipoEst: document.getElementById("cpTipoEst").value, refeicao: document.getElementById("cpRefeicao").value,
+        checkMobiliaStatus: selecoesMemoria.cp[1] || "NA", checkMobiliaObs: document.getElementById("cp_txt_o_1").value,
+        checkRecepcaoStatus: selecoesMemoria.cp[2] || "NA", checkRecepcaoObs: document.getElementById("cp_txt_o_2").value
       };
-
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
-        if(r.sucesso) {
-          alert("🏁 Fluxo de mobilização concluído com sucesso e sincronizado no Excel!");
-          location.reload();
-        }
-      } catch(e) { alert("Erro de rede."); }
+        if(r.sucesso) { alert("🏁 Mobilização concluída!"); location.reload(); }
+      } catch(e) { alert("Erro."); }
     }
 
     async function salvarMobilizacaoExistente() {
       const c = document.getElementById("meColab").value.trim();
-      if(!c) return alert("Digite o nome do colaborador!");
-
+      if(!c) return alert("Digite o nome!");
       const payload = {
         acao: "salvarMobilizacaoExistente", operador: usuarioNome,
         dados: {
-          colaborador: c, contratoOri: document.getElementById("meContratoOri").value,
-          equipeOri: document.getElementById("meEquipeOri").value, cidOri: document.getElementById("meCidOri").value,
-          estOri: document.getElementById("meEstOri").value, contratoDest: document.getElementById("meContratoDest").value,
-          equipeDest: document.getElementById("meEquipeDest").value, cidDest: document.getElementById("meCidDest").value,
-          estDest: document.getElementById("meEstDest").value, dataSai: document.getElementById("meDataSai").value,
-          dataCheg: document.getElementById("meDataCheg").value,
-          chequeSeguranca: document.getElementById("meCheckSeg").checked ? "VALIDADO" : "PENDENTE"
+          colaborador: c, contratoOri: document.getElementById("meContratoOri").value, equipeOri: document.getElementById("meEquipeOri").value,
+          cidOri: document.getElementById("meCidOri").value, estOri: document.getElementById("meEstOri").value,
+          contratoDest: document.getElementById("meContratoDest").value, equipeDest: document.getElementById("meEquipeDest").value,
+          cidDest: document.getElementById("meCidDest").value, estDest: document.getElementById("meEstDest").value,
+          dataSai: document.getElementById("meDataSai").value, dataCheg: document.getElementById("meDataCheg").value,
+          chequeSeguranca: statusMeGlobal
         }
       };
-
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
-        if(r.sucesso) { alert("✓ Transferência Inter-Obras gravada com sucesso!"); location.reload(); }
-      } catch(e) { alert("Erro ao salvar."); }
+        if(r.sucesso) { alert("✓ Transferência gravada!"); location.reload(); }
+      } catch(e) { alert("Erro."); }
+    }
+
+    // SUPORTE AO REGISTRO DO SERVICE WORKER JÁ EXISTENTE
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker ativo.'))
+          .catch(err => console.log('Erro de worker:', err));
+      });
     }
   </script>
 </body>

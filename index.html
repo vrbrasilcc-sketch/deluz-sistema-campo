@@ -18,7 +18,6 @@
     .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 1035; display: none; }
     .overlay.ativo { display: block; }
     
-    /* Gerenciamento de margem do topo dinâmico */
     .conteudo-principal { margin-top: 30px; padding: 15px; margin-bottom: 60px; }
     .logado-topo { margin-top: 90px !important; }
     
@@ -31,7 +30,7 @@
     .sub-bloco h6 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
     .escondido { display: none !important; }
     
-    /* LAYOUT MATRICIAL ROBUSTO (C, NC, NA) */
+    /* CHECKLIST MATRICIAL (C, NC, NA) */
     .container-item-checklist { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .titulo-item-checklist { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
     .grupo-botoes-status { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -150,7 +149,7 @@
           <select id="selectFiltroLog" class="form-select"></select>
         </div>
         <div class="sub-bloco" style="border-left-color: #eab308;">
-          <h6 class="text-dark">📅 Planejamento de Deslocamento e Custos (6 Diretrizes)</h6>
+          <h6 class="text-dark">📅 Planejamento de Deslocamento e Custos</h6>
           <div class="row g-3">
             <div class="col-md-6"><label class="form-label">Previsão Saída Origem</label><input type="date" id="logSaida" class="form-control"></div>
             <div class="col-md-6"><label class="form-label">Previsão Chegada Escritório</label><input type="date" id="logChegada" class="form-control"></div>
@@ -247,8 +246,8 @@
   </div>
 
   <script>
-    // ⚠️ ATENÇÃO: COLOQUE A SUA URL GERADA NO APPS SCRIPT ENTRE AS ASPAS ABAIXO
-    const URL_API = "https://script.google.com/macros/s/AKfycby7Z90BnJwE78BeyNhYebCOZoBUjxay53u-k1mj4Iqme_621Txju7ebguFfnQ7O8gvF/exec";
+    // ⚠️ ATENÇÃO: COLA A TUA URL DO GOOGLE APPS SCRIPT ENTRE AS ASPAS ABAIXO
+    const URL_API = "SUA_URL_DO_APPS_SCRIPT_AQUI";
     
     let perfilLogado = ""; let usuarioNome = "";
     let loteTemporario = []; let bancoContratacoesMemoria = {};
@@ -288,7 +287,7 @@
             <button class="btn-status nconf" id="${prefixo}_b_nc_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NC')">NÃO CONFORME</button>
             <button class="btn-status na active" id="${prefixo}_b_na_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NA')">N/A</button>
           </div>
-          <textarea id="${prefixo}_txt_o_${itemIdx}" class="txt-obs-generosa" placeholder="Campo de observação técnica ou pendências identificadas..."></textarea>
+          <textarea id="${prefixo}_txt_o_${itemIdx}" class="txt-obs-generosa" placeholder="Campo de observação técnica..."></textarea>
         `;
         wrapper.appendChild(div);
       });
@@ -408,7 +407,7 @@
             const opt = document.createElement("option"); opt.value = item.colaborador; opt.innerText = item.colaborador;
             document.getElementById("selectFiltroRH").appendChild(opt);
           });
-          alert("Lote enviado com sucesso!");
+          dispararAlertaVisualTela("Nova Solicitação Deluz", `Lote enviado com sucesso pelo operador ${usuarioNome}! Setores notificados.`);
           loteTemporario = []; document.getElementById("listaTempContratados").innerHTML = "";
           navegar('moduloRH');
         }
@@ -428,7 +427,8 @@
         if(r.sucesso) {
           const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
           document.getElementById("selectFiltroLog").appendChild(opt);
-          alert("Aprovado pelo RH. Liberado para Logística!"); navegar('moduloLogistica');
+          dispararAlertaVisualTela("Admissão Concluída", `${colab} aprovado no RH e encaminhado para a Logística.`);
+          navegar('moduloLogistica');
         }
       } catch(e) { alert("Erro."); }
     }
@@ -456,7 +456,8 @@
         if(r.sucesso) {
           const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
           document.getElementById("selectFiltroCampo").appendChild(opt);
-          alert("Logística e Segurança consolidadas!"); navegar('moduloCampo');
+          dispararAlertaVisualTela("Logística Pronta", `${colab} liberado do escritório. Supervisor de campo notificado!`);
+          navegar('moduloCampo');
         }
       } catch(e) { alert("Erro."); }
     }
@@ -481,7 +482,10 @@
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
-        if(r.sucesso) { alert("🏁 Mobilização concluída!"); location.reload(); }
+        if(r.sucesso) { 
+          alert("🏁 Mobilização concluída com sucesso!"); 
+          location.reload(); 
+        }
       } catch(e) { alert("Erro."); }
     }
 
@@ -506,13 +510,45 @@
       } catch(e) { alert("Erro."); }
     }
 
-    // SUPORTE AO REGISTRO DO SERVICE WORKER JÁ EXISTENTE
+    // =================================================================
+    // VÍNCULO DE INSTALAÇÃO (PWA) E PEDIDO DE PERMISSÃO DE NOTIFICAÇÕES
+    // =================================================================
+    let disparadorInstalacao = null;
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker ativo.'))
+          .then(reg => {
+            console.log('Service Worker operacional.');
+            solicitarPermissaoNotificacao();
+          })
           .catch(err => console.log('Erro de worker:', err));
       });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      disparadorInstalacao = e;
+    });
+
+    function solicitarPermissaoNotificacao() {
+      if ('Notification' in window) {
+        Notification.requestPermission();
+      }
+    }
+
+    function dispararAlertaVisualTela(tituloNotificacao, mensagemNotificacao) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(tituloNotificacao, {
+            body: mensagemNotificacao,
+            icon: './deluzps_logo.jpg',
+            vibrate: [200, 100, 200]
+          });
+        });
+      } else {
+        alert(`🔔 [ALERTA DELUZ]: ${tituloNotificacao}\n\n${mensagemNotificacao}`);
+      }
     }
   </script>
 </body>

@@ -10,6 +10,10 @@
     body { background-color: #f1f5f9; font-size: 16px; font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
     .navbar-deluz { background-color: #004a8d; color: white; position: fixed; width: 100%; top: 0; z-index: 1030; height: 65px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .navbar-deluz span { font-size: 1.1rem; }
+    
+    /* BADGE DE PERFIL DISCRETO À DIREITA */
+    .badge-perfil-discreto { font-size: 0.85rem !important; font-weight: 500; color: #e2e8f0; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); padding: 6px 12px; border-radius: 20px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
     .sidebar { position: fixed; top: 0; bottom: 0; left: -290px; width: 290px; z-index: 1040; background-color: #ffffff; box-shadow: 4px 0 15px rgba(0,0,0,0.15); transition: all 0.3s ease; padding-top: 20px; }
     .sidebar.ativo { left: 0; }
     .sidebar .nav-link { color: #475569; font-weight: 600; font-size: 1.05rem; padding: 14px 20px; border-radius: 8px; margin: 5px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
@@ -17,10 +21,8 @@
     .sidebar .btn-sair { color: #dc2626; border-top: 1px solid #edf2f7; margin-top: auto; padding-top: 20px; }
     .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 1035; display: none; }
     .overlay.ativo { display: block; }
-    
     .conteudo-principal { margin-top: 30px; padding: 15px; margin-bottom: 60px; }
     .logado-topo { margin-top: 90px !important; }
-    
     .card-deluz { border-radius: 16px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; padding: 24px !important; }
     .secao-titulo { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
     .form-label { font-weight: 600; color: #334155; font-size: 0.95rem; margin-bottom: 6px; }
@@ -30,7 +32,7 @@
     .sub-bloco h6 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
     .escondido { display: none !important; }
     
-    /* CHECKLIST MATRICIAL (C, NC, NA) */
+    /* CHECKLIST MATRICIAL ROBUSTO (C, NC, NA) */
     .container-item-checklist { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .titulo-item-checklist { font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
     .grupo-botoes-status { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -42,14 +44,18 @@
     .btn-status.na { border-color: #94a3b8; color: #94a3b8; }
     .btn-status.na.active { background: #94a3b8; color: #fff; box-shadow: 0 3px 6px rgba(148,163,184,0.3); }
     .txt-obs-generosa { width: 100%; min-height: 85px; font-size: 1.05rem; border-radius: 8px; padding: 10px; border: 1px solid #cbd5e1; background: #f8fafc; resize: vertical; }
+    
+    /* BOTÕES DE PESQUISA SUPORTE DE TRECHO */
+    .btn-pesquisa-externa { font-weight: 600; font-size: 0.95rem; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #334155; transition: 0.2s; cursor: pointer; }
+    .btn-pesquisa-externa:hover { background: #e2e8f0; color: #0f172a; }
   </style>
 </head>
 <body>
 
   <nav id="barraTopoNav" class="navbar navbar-deluz px-3 d-flex align-items-center justify-content-between escondido">
     <button class="btn text-white fs-3 p-0 m-0 id-btn-menu" onclick="alternarSidebar()">☰</button>
-    <span class="fw-bold m-auto">⚡ DELUZ - GESTÃO DE EQUIPES</span>
-    <span id="badgePerfil" class="badge bg-white text-dark p-2"></span>
+    <span class="fw-bold me-auto ps-3">DELUZ</span>
+    <span id="badgePerfil" class="badge-perfil-discreto text-end"></span>
   </nav>
 
   <div id="sidebarMenu" class="sidebar d-flex flex-column">
@@ -85,7 +91,7 @@
           <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha()">👁️</button>
         </div>
       </div>
-      <button onclick="realizarLogin()" class="btn btn-primary w-100 fw-bold py-2 fs-5" style="background-color: #004a8d; border-radius: 10px;">Entrar</button>
+      <button onclick="realizarLogin()" class="btn btn-primary w-100 fw-bold py-2 fs-5" style="background-color: #004a8d;">Entrar</button>
       <div id="msgErroLogin" class="text-danger text-center small mt-3 fw-bold"></div>
     </div>
 
@@ -116,15 +122,19 @@
             <div class="col-md-6"><label class="form-label">Encarregado Técnico</label><input type="text" id="ncEncarregado" class="form-control"></div>
             <div class="col-md-6"><label class="form-label">Contrato Ativo</label><input type="text" id="ncContrato" class="form-control"></div>
             <div class="col-md-6"><label class="form-label">Código da Equipe</label><input type="text" id="ncEquipe" class="form-control"></div>
-            <div class="col-12">
+            <div class="col-md-4">
+              <label class="form-label">Estado Destino</label>
+              <select id="ncEstadoAloj" class="form-select" onchange="carregarCidades('ncEstadoAloj', 'ncCidAloj')"><option value="">-- UF --</option></select>
+            </div>
+            <div class="col-md-8">
               <label class="form-label">Cidade Destino (Alojamento)</label>
-              <select id="ncCidAloj" class="form-select"><option value="">-- Aguardando UF de Origem --</option></select>
+              <select id="ncCidAloj" class="form-select"><option value="">-- Selecione a UF de Destino --</option></select>
             </div>
           </div>
         </div>
         <div class="d-flex flex-column gap-2 mt-3">
           <button onclick="adicionarListaTemporaria()" class="btn btn-outline-secondary fw-bold py-2">➕ Adicionar Colaborador ao Lote</button>
-          <button onclick="dispararNovaContratacao()" class="btn btn-primary fw-bold py-3 fs-5" style="background-color: #004a8d; border-radius: 12px;">🚀 Finalizar e Enviar Solicitação</button>
+          <button onclick="dispararNovaContratacao()" class="btn btn-primary fw-bold py-3 fs-5" style="background-color: #004a8d;">🚀 Finalizar e Enviar Solicitação</button>
         </div>
         <div class="mt-4 border-top pt-3" id="blocoListaTemp">
           <h6 class="fw-bold text-secondary">Integrantes Cadastrados neste Lote:</h6>
@@ -139,7 +149,7 @@
           <select id="selectFiltroRH" class="form-select"></select>
         </div>
         <div id="containerItensRH"></div>
-        <button onclick="concluirEtapaRH()" class="btn btn-success btn-lg w-100 fw-bold mt-4 shadow-sm">✓ Concluir Análise e Encaminhar</button>
+        <button onclick="concluirEtapaRH()" class="btn btn-success btn-lg w-100 fw-bold mt-4">✓ Concluir Análise e Encaminhar</button>
       </div>
 
       <div id="moduloLogistica" class="subsecao escondido card card-deluz">
@@ -165,37 +175,56 @@
           <h6 class="text-dark">🛡️ Checklist de Chegada (Segurança e Infraestrutura)</h6>
           <div id="containerItensSegurança"></div>
         </div>
-        <button onclick="concluirLogisticaESeguranca()" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">🚀 Liberar Profissional para o Campo</button>
+        <button onclick="concluirLogisticaESeguranca()" class="btn btn-primary btn-lg w-100 fw-bold">🚀 Liberar Profissional para o Campo</button>
       </div>
 
       <div id="moduloCampo" class="subsecao escondido card card-deluz">
         <h5 class="secao-titulo">🤠 Gestão e Estruturação de Alojamento</h5>
         <div class="mb-3 p-3 bg-light border rounded-3">
           <label class="form-label text-primary">Equipes Prontas para o Trecho:</label>
-          <select id="selectFiltroCampo" class="form-select" onchange="puxarDadosAutomaticosCampo()"></select>
+          <select id="selectFiltroCampo" class="form-select" onchange="puxarDadosAutomaticosCampo()">
+            <option value="">-- Selecione o Colaborador Liberado --</option>
+          </select>
         </div>
         <div class="row g-3 mb-4 bg-light p-3 border rounded-3">
           <div class="col-md-6"><span class="small fw-bold text-secondary d-block">Equipe vinculada:</span><input type="text" id="autoEquipe" class="form-control bg-white" readonly></div>
           <div class="col-md-6"><span class="small fw-bold text-secondary d-block">Ponto de Alojamento:</span><input type="text" id="autoCid" class="form-control bg-white" readonly></div>
         </div>
+        
         <div class="sub-bloco" style="border-left-color: #8b5cf6;">
           <h6 class="text-dark">🛠️ Homologação Físico-Estrutural</h6>
           <div class="mb-3">
             <label class="form-label">Tipo de Acomodação Definida</label>
             <select id="cpTipoEst" class="form-select">
-              <option value="Hotel">Estrutura Hoteleira</option>
-              <option value="Airbnb">Locação por Temporada (Airbnb)</option>
-              <option value="Alojamento">Alojamento Próprio Deluz</option>
-              <option value="Pousada">Pousada Comercial</option>
+              <option value="Hotel">Hotel</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Alojamento">Alojamento</option>
+              <option value="Pousada">Pousada</option>
             </select>
           </div>
-          <div class="mb-4">
+
+          <div class="mb-3 bg-white p-2 border rounded-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="small text-muted fw-bold ps-1">🔍 Pesquisar Acomodação Alvo:</span>
+            <button onclick="executarBuscaSuporteTrecho('hospedagem', 'maps')" class="btn-pesquisa-externa">🗺️ Maps</button>
+            <button onclick="executarBuscaSuporteTrecho('hospedagem', 'facebook')" class="btn-pesquisa-externa">👥 Facebook</button>
+            <button onclick="executarBuscaSuporteTrecho('hospedagem', 'olx')" class="btn-pesquisa-externa">📦 OLX</button>
+          </div>
+
+          <div class="mb-3">
             <label class="form-label">Restaurantes e Alimentação Homologados</label>
             <input type="text" id="cpRefeicao" class="form-control" placeholder="Identificação dos fornecedores locais">
           </div>
+
+          <div class="mb-4 bg-white p-2 border rounded-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="small text-muted fw-bold ps-1">🔍 Pesquisar Alimentação Alvo:</span>
+            <button onclick="executarBuscaSuporteTrecho('refeicao', 'maps')" class="btn-pesquisa-externa">🗺️ Maps</button>
+            <button onclick="executarBuscaSuporteTrecho('refeicao', 'facebook')" class="btn-pesquisa-externa">👥 Facebook</button>
+            <button onclick="executarBuscaSuporteTrecho('refeicao', 'olx')" class="btn-pesquisa-externa">📦 OLX</button>
+          </div>
+
           <div id="containerItensCampo"></div>
         </div>
-        <button onclick="finalizarGeralCampo()" class="btn btn-warning btn-lg w-100 fw-bold shadow-sm text-dark">🏁 Consolidar Processo de Mobilização</button>
+        <button onclick="finalizarGeralCampo()" class="btn btn-warning btn-lg w-100 fw-bold text-dark">🏁 Consolidar Processo de Mobilização</button>
       </div>
 
       <div id="moduloMobilizacaoExistente" class="subsecao card card-deluz escondido">
@@ -239,19 +268,20 @@
             </div>
           </div>
         </div>
-        <button onclick="salvarMobilizacaoExistente()" class="btn btn-secondary btn-lg w-100 fw-bold shadow-sm">✓ Efetivar Movimentação de Pessoal</button>
+        <button onclick="salvarMobilizacaoExistente()" class="btn btn-secondary btn-lg w-100 fw-bold">✓ Efetivar Movimentação de Pessoal</button>
       </div>
 
     </div>
   </div>
 
   <script>
-    // ⚠️ ATENÇÃO: COLA A TUA URL DO GOOGLE APPS SCRIPT ENTRE AS ASPAS ABAIXO
+    // ⚠️ RELEMBRE DE INSERIR SUA URL DEFINITIVA DO APPS SCRIPT ABAIXO MANTENDO AS ASPAS
     const URL_API = "https://script.google.com/macros/s/AKfycby7Z90BnJwE78BeyNhYebCOZoBUjxay53u-k1mj4Iqme_621Txju7ebguFfnQ7O8gvF/exec";
     
     let perfilLogado = ""; let usuarioNome = "";
-    let loteTemporario = []; let bancoContratacoesMemoria = {};
+    let loteTemporario = []; let cachePlanilhaEsteira = [];
     let statusMeGlobal = "PENDENTE";
+    let memoriaLocalidadeAlvo = { cidade: "", estado: "" };
 
     const ITENS_RH = ["Documentação de Admissão", "Exames e Laudos Laborais", "Registro em Carteira / Sistema", "Alinhamento SST (PGR/PCMSO)", "Plataforma Interna de Liberação", "Sincronização de Cartão de Ponto"];
     const ITENS_SEG = ["Documentação de Segurança", "Separação e Entrega de EPIs", "Alocação de EPCs Coletivos", "Kit de Utensílios Domésticos", "Integração Interna Escritório", "Distribuição de Materiais Técnicos", "Treinamento Técnico Normativo (NRs)", "Aparelho Celular Corporativo", "Treinamento Funcional Check Mob", "Disponibilização de Veículo de Trabalho", "Máquinas, Equipamentos e Ferramental", "LPU (Licença para Porte e Uso)", "LO (Licença de Operação)", "Integração Final na Contratante"];
@@ -259,12 +289,23 @@
 
     const ESTADOS_BR = [{uf:"AC", nome:"Acre"}, {uf:"AL", nome:"Alagoas"}, {uf:"AP", nome:"Amapá"}, {uf:"AM", nome:"Amazonas"}, {uf:"BA", nome:"Bahia"}, {uf:"CE", nome:"Ceará"}, {uf:"DF", nome:"Distrito Federal"}, {uf:"ES", nome:"Espírito Santo"}, {uf:"GO", nome:"Goiás"}, {uf:"MA", nome:"Maranhão"}, {uf:"MT", nome:"Mato Grosso"}, {uf:"MS", nome:"Mato Grosso do Sul"}, {uf:"MG", nome:"Minas Gerais"}, {uf:"PA", nome:"Pará"}, {uf:"PB", nome:"Paraíba"}, {uf:"PR", nome:"Paraná"}, {uf:"PE", nome:"Pernambuco"}, {uf:"PI", nome:"Piauí"}, {uf:"RJ", nome:"Rio de Janeiro"}, {uf:"RN", nome:"Rio Grande do Norte"}, {uf:"RS", nome:"Rio Grande do Sul"}, {uf:"RO", nome:"Rondônia"}, {uf:"RR", nome:"Roraima"}, {uf:"SC", nome:"Santa Catarina"}, {uf:"SP", nome:"São Paulo"}, {uf:"SE", nome:"Sergipe"}, {uf:"TO", nome:"Tocantins"}];
 
+    // VERIFICAÇÃO AUTOMÁTICA DE SESSÃO SALVA AO CARREGAR O SITE
     window.addEventListener('DOMContentLoaded', () => {
-      ['ncEstado', 'meEstOri', 'meEstDest'].forEach(id => {
+      ['ncEstado', 'ncEstadoAloj', 'meEstOri', 'meEstDest'].forEach(id => {
         const s = document.getElementById(id);
         if(s) ESTADOS_BR.forEach(e => { const o = document.createElement('option'); o.value = e.uf; o.innerText = e.nome; s.appendChild(o); });
       });
       renderizarComponentesMatriciais();
+      
+      // CHECAGEM DE PERSISTÊNCIA DO LOCALSTORAGE
+      const usuarioSalvo = localStorage.getItem("deluz_usuario");
+      const perfilSalvo = localStorage.getItem("deluz_perfil");
+      
+      if (usuarioSalvo && perfilSalvo) {
+        perfilLogado = perfilSalvo;
+        usuarioNome = usuarioSalvo;
+        ativarInterfaceLogada();
+      }
     });
 
     function renderizarComponentesMatriciais() {
@@ -287,7 +328,7 @@
             <button class="btn-status nconf" id="${prefixo}_b_nc_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NC')">NÃO CONFORME</button>
             <button class="btn-status na active" id="${prefixo}_b_na_${itemIdx}" onclick="atualizarCliqueStatus('${prefixo}', ${itemIdx}, 'NA')">N/A</button>
           </div>
-          <textarea id="${prefixo}_txt_o_${itemIdx}" class="txt-obs-generosa" placeholder="Campo de observação técnica..."></textarea>
+          <textarea id="${prefixo}_txt_o_${itemIdx}" class="txt-obs-generosa" placeholder="Campo de observation técnica..."></textarea>
         `;
         wrapper.appendChild(div);
       });
@@ -299,7 +340,6 @@
       document.getElementById(`${prefixo}_b_c_${itemIdx}`).classList.remove("active");
       document.getElementById(`${prefixo}_b_nc_${itemIdx}`).classList.remove("active");
       document.getElementById(`${prefixo}_b_na_${itemIdx}`).classList.remove("active");
-      
       if(valorStatus === 'C') document.getElementById(`${prefixo}_b_c_${itemIdx}`).classList.add("active");
       if(valorStatus === 'NC') document.getElementById(`${prefixo}_b_nc_${itemIdx}`).classList.add("active");
       if(valorStatus === 'NA') document.getElementById(`${prefixo}_b_na_${itemIdx}`).classList.add("active");
@@ -325,11 +365,6 @@
         cidades.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(cid => {
           const opt = document.createElement('option'); opt.value = cid.nome; opt.innerText = cid.nome; selectCidade.appendChild(opt);
         });
-        if(idSelectEstado === 'ncEstado') {
-          const selectAloj = document.getElementById('ncCidAloj');
-          selectAloj.innerHTML = '<option value="">-- Selecione a Cidade --</option>';
-          cidades.forEach(cid => { const opt = document.createElement('option'); opt.value = cid.nome; opt.innerText = cid.nome; selectAloj.appendChild(opt); });
-        }
       } catch (e) { selectCidade.innerHTML = '<option value="">Falha de conexão com o IBGE</option>'; }
     }
 
@@ -338,12 +373,37 @@
       document.getElementById("overlayMenu").classList.toggle("ativo");
     }
 
+    async function sincronizarDadosEsteiraPlanilha() {
+      try {
+        const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "obterListaEsteira" }) });
+        const r = await res.json();
+        if(r.sucesso) {
+          cachePlanilhaEsteira = r.lista;
+          const selRh = document.getElementById("selectFiltroRH");
+          const selLog = document.getElementById("selectFiltroLog");
+          const selCamp = document.getElementById("selectFiltroCampo");
+          
+          selRh.innerHTML = '<option value="">-- Escolha o colaborador na esteira --</option>';
+          selLog.innerHTML = '<option value="">-- Selecione o Colaborador --</option>';
+          selCamp.innerHTML = '<option value="">-- Selecione o Colaborador --</option>';
+          
+          r.lista.forEach(item => {
+            const opt = document.createElement("option"); opt.value = item.colaborador; opt.innerText = item.colaborador;
+            selRh.appendChild(opt.cloneNode(true));
+            selLog.appendChild(opt.cloneNode(true));
+            selCamp.appendChild(opt.cloneNode(true));
+          });
+        }
+      } catch(e) { console.log("Erro ao sincronizar com Sheets"); }
+    }
+
     function navegar(idSubTela) {
       document.querySelectorAll(".subsecao").forEach(s => s.classList.add("escondido"));
       document.getElementById(idSubTela).classList.remove("escondido");
       document.querySelectorAll(".sidebar .nav-link").forEach(l => l.classList.remove("active"));
       const links = { moduloContratacao: 'lnkContratar', moduloRH: 'lnkRh', moduloLogistica: 'lnkLogistica', moduloCampo: 'lnkCampo', moduloMobilizacaoExistente: 'lnkMobilizacao' };
       if(links[idSubTela]) document.getElementById(links[idSubTela]).classList.add("active");
+      if(idSubTela !== 'moduloContratacao') sincronizarDadosEsteiraPlanilha();
       if(document.getElementById("sidebarMenu").classList.contains("ativo")) alternarSidebar();
     }
 
@@ -359,18 +419,29 @@
         if(r.sucesso) {
           perfilLogado = r.perfil; usuarioNome = u;
           
-          document.getElementById("telaLogin").classList.add("escondido");
-          document.getElementById("areaInterna").classList.remove("escondido");
-          document.getElementById("barraTopoNav").classList.remove("escondido");
-          document.getElementById("wrapperConteudo").classList.add("logado-topo");
+          // GRAVA A SESSÃO OPERACIONAL NA MEMÓRIA DO NAVEGADOR
+          localStorage.setItem("deluz_usuario", u);
+          localStorage.setItem("deluz_perfil", r.perfil);
           
-          document.getElementById("badgePerfil").innerText = `Perfil: ${perfilLogado.toUpperCase()}`;
-          navegar('moduloContratacao');
+          ativarInterfaceLogada();
         } else { document.getElementById("msgErroLogin").innerText = r.erro; }
       } catch(e) { document.getElementById("msgErroLogin").innerText = "Falha crítica de comunicação."; }
     }
 
+    function ativarInterfaceLogada() {
+      document.getElementById("telaLogin").classList.add("escondido");
+      document.getElementById("areaInterna").classList.remove("escondido");
+      document.getElementById("barraTopoNav").classList.remove("escondido");
+      document.getElementById("wrapperConteudo").classList.add("logado-topo");
+      
+      // EXIBE PERFIL NO CANTO SUPERIOR DIREITO DE FORMA DISCRETA
+      document.getElementById("badgePerfil").innerText = `${usuarioNome.toUpperCase()} (${perfilLogado.toUpperCase()})`;
+      navegar('moduloContratacao');
+    }
+
     function logout() {
+      localStorage.removeItem("deluz_usuario");
+      localStorage.removeItem("deluz_perfil");
       perfilLogado = ""; usuarioNome = "";
       document.getElementById("areaInterna").classList.add("escondido");
       document.getElementById("barraTopoNav").classList.add("escondido");
@@ -386,12 +457,13 @@
         colaborador: nome, cidade: document.getElementById("ncCidade").value, estado: document.getElementById("ncEstado").value,
         telefone: document.getElementById("ncTelefone").value, supervisor: document.getElementById("ncSupervisor").value,
         encarregado: document.getElementById("ncEncarregado").value, contrato: document.getElementById("ncContrato").value,
-        equipe: document.getElementById("ncEquipe").value, cidadeAloj: document.getElementById("ncCidAloj").value
+        equipe: document.getElementById("ncEquipe").value, cidadeAloj: document.getElementById("ncCidAloj").value,
+        estadoAloj: document.getElementById("ncEstadoAloj").value
       };
       loteTemporario.push(obj);
       const li = document.createElement("li");
       li.className = "list-group-item py-2 bg-light font-weight-bold";
-      li.innerText = `${obj.colaborador} (Destino: ${obj.cidadeAloj})`;
+      li.innerText = `${obj.colaborador} (Destino: ${obj.cidadeAloj} - ${obj.estadoAloj})`;
       document.getElementById("listaTempContratados").appendChild(li);
       document.getElementById("ncNome").value = "";
     }
@@ -402,11 +474,6 @@
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "salvarNovaContratacao", lote: loteTemporario, operador: usuarioNome }) });
         const r = await res.json();
         if(r.sucesso) {
-          loteTemporario.forEach(item => {
-            bancoContratacoesMemoria[item.colaborador] = item;
-            const opt = document.createElement("option"); opt.value = item.colaborador; opt.innerText = item.colaborador;
-            document.getElementById("selectFiltroRH").appendChild(opt);
-          });
           dispararAlertaVisualTela("Nova Solicitação Deluz", `Lote enviado com sucesso pelo operador ${usuarioNome}! Setores notificados.`);
           loteTemporario = []; document.getElementById("listaTempContratados").innerHTML = "";
           navegar('moduloRH');
@@ -425,8 +492,6 @@
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify({ acao: "atualizarEsteira", etapa: "RH", colaborador: colab, checks: dataCheck }) });
         const r = await res.json();
         if(r.sucesso) {
-          const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
-          document.getElementById("selectFiltroLog").appendChild(opt);
           dispararAlertaVisualTela("Admissão Concluída", `${colab} aprovado no RH e encaminhado para a Logística.`);
           navegar('moduloLogistica');
         }
@@ -454,8 +519,6 @@
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
         if(r.sucesso) {
-          const opt = document.createElement("option"); opt.value = colab; opt.innerText = colab;
-          document.getElementById("selectFiltroCampo").appendChild(opt);
           dispararAlertaVisualTela("Logística Pronta", `${colab} liberado do escritório. Supervisor de campo notificado!`);
           navegar('moduloCampo');
         }
@@ -464,10 +527,54 @@
 
     function puxarDadosAutomaticosCampo() {
       const colab = document.getElementById("selectFiltroCampo").value;
-      if(!colab || !bancoContratacoesMemoria[colab]) return;
-      const d = bancoContratacoesMemoria[colab];
-      document.getElementById("autoEquipe").value = d.equipe || "";
-      document.getElementById("autoCid").value = `${d.cidadeAloj || ""} - ${d.estado || ""}`;
+      if(!colab) return;
+      const localizado = cachePlanilhaEsteira.find(item => item.colaborador === colab);
+      if(localizado) {
+        document.getElementById("autoEquipe").value = localizado.equipe || "Não Informado";
+        document.getElementById("autoCid").value = `${localizado.cidadeAloj || ""} - ${localizado.estadoAloj || ""}`;
+        memoriaLocalidadeAlvo.cidade = localizado.cidadeAloj || "";
+        memoriaLocalidadeAlvo.estado = localizado.estadoAloj || "";
+      }
+    }
+
+    function verificarLocalidadeEAlerta() {
+      if (!memoriaLocalidadeAlvo.cidade || !memoriaLocalidadeAlvo.estado) {
+        alert("Por favor, selecione primeiro um colaborador válido para herdar a cidade e estado do trecho!");
+        return false;
+      }
+      return true;
+    }
+
+    // MOTOR DE BUSCA EM TEMPO REAL PELO SMARTPHONE
+    function executarBuscaSuporteTrecho(contexto, plataforma) {
+      if (!verificarLocalidadeEAlerta()) return;
+      
+      const cid = encodeURIComponent(memoriaLocalidadeAlvo.cidade);
+      const est = encodeURIComponent(memoriaLocalidadeAlvo.estado);
+      let queryUrl = "";
+
+      if (contexto === "hospedagem") {
+        const tipoEscolhido = document.getElementById("cpTipoEst").value;
+        if (plataforma === "maps") {
+          queryUrl = `https://www.google.com/maps/search/${tipoEscolhido}+em+${cid}+-+${est}`;
+        } else if (plataforma === "facebook") {
+          queryUrl = `https://www.facebook.com/search/top/?q=${tipoEscolhido}%20em%20${cid}%20${est}`;
+        } else if (plataforma === "olx") {
+          queryUrl = `https://www.olx.com.br/anuncios?q=${tipoEscolhido}%20${cid}%20${est}`;
+        }
+      } else if (contexto === "refeicao") {
+        if (plataforma === "maps") {
+          queryUrl = `https://www.google.com/maps/search/restaurantes+e+marmitarias+em+${cid}+-+${est}`;
+        } else if (plataforma === "facebook") {
+          queryUrl = `https://www.facebook.com/search/top/?q=restaurante%20marmitaria%20em%20${cid}%20${est}`;
+        } else if (plataforma === "olx") {
+          queryUrl = `https://www.olx.com.br/anuncios?q=marmita%20restaurante%20${cid}%20${est}`;
+        }
+      }
+
+      if (queryUrl) {
+        window.open(queryUrl, "_blank");
+      }
     }
 
     async function finalizarGeralCampo() {
@@ -482,10 +589,7 @@
       try {
         const res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
         const r = await res.json();
-        if(r.sucesso) { 
-          alert("🏁 Mobilização concluída com sucesso!"); 
-          location.reload(); 
-        }
+        if(r.sucesso) { alert("🏁 Mobilização concluída com sucesso!"); location.reload(); }
       } catch(e) { alert("Erro."); }
     }
 
@@ -510,45 +614,17 @@
       } catch(e) { alert("Erro."); }
     }
 
-    // =================================================================
-    // VÍNCULO DE INSTALAÇÃO (PWA) E PEDIDO DE PERMISSÃO DE NOTIFICAÇÕES
-    // =================================================================
-    let disparadorInstalacao = null;
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => {
-            console.log('Service Worker operacional.');
-            solicitarPermissaoNotificacao();
-          })
-          .catch(err => console.log('Erro de worker:', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => console.log('Worker OK.'));
       });
     }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      disparadorInstalacao = e;
-    });
-
-    function solicitarPermissaoNotificacao() {
-      if ('Notification' in window) {
-        Notification.requestPermission();
-      }
-    }
-
-    function dispararAlertaVisualTela(tituloNotificacao, mensagemNotificacao) {
+    
+    function solicitarPermissaoNotificacao() { if ('Notification' in window) { Notification.requestPermission(); } }
+    function dispararAlertaVisualTela(t, m) {
       if ('Notification' in window && Notification.permission === 'granted') {
-        navigator.serviceWorker.ready.then(reg => {
-          reg.showNotification(tituloNotificacao, {
-            body: mensagemNotificacao,
-            icon: './deluzps_logo.jpg',
-            vibrate: [200, 100, 200]
-          });
-        });
-      } else {
-        alert(`🔔 [ALERTA DELUZ]: ${tituloNotificacao}\n\n${mensagemNotificacao}`);
-      }
+        navigator.serviceWorker.ready.then(reg => { reg.showNotification(t, { body: m, icon: './deluzps_logo.jpg' }); });
+      } else { alert(`🔔 [ALERTA DELUZ]: ${t}\n\n${m}`); }
     }
   </script>
 </body>
